@@ -17,18 +17,21 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener
 {
-    private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
+    private RecyclerView recyclerView;
+    private List<song> songList;
+    private RecyclerViewAdapter adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         TextView username_label = (TextView) findViewById(R.id.username);
-        username_label.setText(public_value.username);
+        //username_label.setText(public_value.username);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -38,21 +41,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         toggle.syncState();
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        //// TODO: 2016/5/28  
-        //card
-        mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
+        //// TODO: 2016/5/28
+        recyclerView= (RecyclerView) findViewById(R.id.my_recycler_view);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        initPersonData();
+        adapter=new RecyclerViewAdapter(songList,MainActivity.this);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setAdapter(adapter);
 
-        // use this setting to improve performance if you know that changes
-        // in content do not change the layout size of the RecyclerView
-        mRecyclerView.setHasFixedSize(true);
 
-        // use a linear layout manager
-        mLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-
-        // specify an adapter (see also next example)
-        //mAdapter = new MyAdapter(myDataset);
-        //mRecyclerView.setAdapter(mAdapter);
+    }
+    private void initPersonData() {
+        songList =new ArrayList<>();
+        songList.add(new song("追梦赤子心 - GALA","「真的超开心苏运营被提名金曲奖最佳女歌手，太棒了！不过竞争激励精彩。希望拿奖吧。希望明天回校听得到（实习狗）点歌于火车上」","27808044"));
+        songList.add(new song("追梦赤子心 - GALA","「真的超开心苏运营被提名金曲奖最佳女歌手，太棒了！不过竞争激励精彩。希望拿奖吧。希望明天回校听得到（实习狗）点歌于火车上」","81807"));
     }
 
     @Override
@@ -93,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camara)
+        /*if (id == R.id.nav_camara)
         {
             // Handle the camera action
         } else if (id == R.id.nav_gallery)
@@ -112,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         {
 
         }
-
+*/
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;

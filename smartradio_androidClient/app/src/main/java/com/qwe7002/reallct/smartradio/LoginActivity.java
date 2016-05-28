@@ -1,8 +1,14 @@
 package com.qwe7002.reallct.smartradio;
 
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 
 import android.os.AsyncTask;
@@ -14,6 +20,7 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 
@@ -32,13 +39,74 @@ public class LoginActivity extends AppCompatActivity
     private TextView mUsernameView;
     private EditText mPasswordView;
     ProgressDialog mpDialog;
-
+    SharedPreferences sharedPreferences;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        // Set up the login form.
+        try
+        {
+            sharedPreferences= getSharedPreferences("Hostinfo", Context.MODE_PRIVATE);
+
+        } catch (Exception e)
+        {
+        }
+        public_value.HostURl = sharedPreferences.getString("Hostinfo", null);
+        if (public_value.HostURl == null||public_value.HostURl.equals("http://")||public_value.HostURl.equals(""))
+        {
+
+            final EditText text=new EditText(this);
+            text.setText("http://");
+            text.setMaxLines(1);
+            AlertDialog alertDialog=new AlertDialog.Builder(this).create();
+            alertDialog.setTitle("请输入服务器地址：");
+            alertDialog.setView(text);
+            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "确定",
+                    new DialogInterface.OnClickListener()
+                    {
+                        public void onClick(DialogInterface dialog, int which)
+                        {
+                            if(!text.getText().toString().equals("http://")||!text.getText().toString().equals(""))
+                            {
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                editor.putString("Hostinfo", text.getText().toString());
+                                editor.commit();
+                                dialog.dismiss();
+                            }
+                        }
+                    });
+            alertDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
+
+                @Override
+                public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+                    if (keyCode == KeyEvent.KEYCODE_SEARCH || keyCode == KeyEvent.KEYCODE_BACK) {
+                        return true;
+                    }
+                    if (keyCode == KeyEvent.KEYCODE_ENTER) {
+                        return true;
+                    }
+                    return false;
+                }
+            });
+            alertDialog.show();
+
+        }
+        if (!isNetConnected())
+        {
+            AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+            alertDialog.setTitle("请链接网络");
+            alertDialog.setMessage("没有检测到可用网络连接，请检查您的网络设置！");
+            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "确定",
+                    new DialogInterface.OnClickListener()
+                    {
+                        public void onClick(DialogInterface dialog, int which)
+                        {
+                            dialog.dismiss();
+                        }
+                    });
+            alertDialog.show();
+        }
         mUsernameView = (TextView) findViewById(R.id.username);
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener()
@@ -81,8 +149,48 @@ public class LoginActivity extends AppCompatActivity
 
     }
 
+    /**
+     * 检测网络是否连接
+     *
+     * @return
+     */
+    private boolean isNetConnected()
+    {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm != null)
+        {
+            NetworkInfo[] infos = cm.getAllNetworkInfo();
+            if (infos != null)
+            {
+                for (NetworkInfo ni : infos)
+                {
+                    if (ni.isConnected())
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     private void attemptLogin()
     {
+        if (!isNetConnected())
+        {
+            AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+            alertDialog.setTitle("请链接网络");
+            alertDialog.setMessage("没有检测到可用网络连接，请检查您的网络设置！");
+            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "确定",
+                    new DialogInterface.OnClickListener()
+                    {
+                        public void onClick(DialogInterface dialog, int which)
+                        {
+                            dialog.dismiss();
+                        }
+                    });
+            alertDialog.show();
+        }
         if (mAuthTask != null)
         {
             return;
@@ -173,18 +281,19 @@ public class LoginActivity extends AppCompatActivity
                 String result = Network.SendPost("/login.php", Postinfo);
                 Gson gson = new Gson();
                 Json_LoginResult LoginResult = gson.fromJson(result, Json_LoginResult.class);
-                if(!LoginResult.getmod())
+                if (!LoginResult.getmod())
                 {
                     return false;
                 }
-                public_value.sessionid=LoginResult.getSessionid();
-                public_value.username=mEmail;
+                public_value.sessionid = LoginResult.getSessionid();
+                public_value.username = mEmail;
             } catch (Exception e)
             {
                 return false;
             }
             return true;
         }
+
         @Override
         protected void onPostExecute(final Boolean success)
         {
@@ -198,7 +307,7 @@ public class LoginActivity extends AppCompatActivity
             {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
-                mpDialog.cancel();
+                mpDialog.hide();
             }
         }
 
