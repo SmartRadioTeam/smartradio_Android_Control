@@ -64,8 +64,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
                 alertDialog
-                        .setTitle("您真的要进行此操作么？")
-                        .setMessage("此操作将打开网易云音乐。")
+                        .setTitle("即将打开网易云音乐")
+                        .setMessage("播放歌曲："+songtable.get(j).getTitle())
                         .setPositiveButton("确定",
                                 new DialogInterface.OnClickListener() {
                                     @Override

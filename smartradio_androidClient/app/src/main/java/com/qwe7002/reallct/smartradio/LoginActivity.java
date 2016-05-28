@@ -275,10 +275,7 @@ public class LoginActivity extends AppCompatActivity
             try
             {
                 //// TODO: 2016/5/28
-                List<NameValuePair> Postinfo = new ArrayList<NameValuePair>(2);
-                Postinfo.add(new BasicNameValuePair("username", mEmail));
-                Postinfo.add(new BasicNameValuePair("password", mPassword));
-                String result = Network.SendPost("/login.php", Postinfo);
+                String result = APIs.Login(mEmail,mPassword);
                 Gson gson = new Gson();
                 Json_LoginResult LoginResult = gson.fromJson(result, Json_LoginResult.class);
                 if (!LoginResult.getmod())

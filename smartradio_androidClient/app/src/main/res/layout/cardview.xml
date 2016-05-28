@@ -23,7 +23,7 @@
                 android:id="@+id/news_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp">
+                android:layout_margin="5dp">
 
                 <TextView
                     android:id="@+id/card_title"
@@ -33,7 +33,10 @@
                     android:text="Blurred Lines - Robin Thicke/T.I./Pharrell"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="25dp"/>
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginBottom="15dp"/>
                 <TextView
                     android:id="@+id/card_message"
                     android:textSize="15sp"
@@ -41,51 +44,50 @@
                     android:layout_below="@+id/card_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="15dp"
+                    android:layout_marginLeft="10dp"
                     android:layout_marginRight="15dp"
-
                     android:layout_centerHorizontal="true"
-                    android:layout_marginBottom="15dp"/>
-                <View
-                    android:id="@+id/Lines"
-                    android:layout_width="wrap_content"
-
-                    android:layout_height="1px"
-                    android:layout_below="@+id/card_message"
-                    android:background="@android:color/darker_gray"
-                    android:layout_marginRight="5dp"/>
-
+                    android:layout_marginBottom="15dp"
+                    android:layout_marginTop="10dp"/>
                 <TextView
                     android:textSize="15sp"
-                    android:layout_below="@+id/Lines"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="点歌人：芋头"
-                    android:id="@+id/textView"
-                    android:layout_alignParentStart="true"
+                    android:id="@+id/user"
                     android:layout_marginLeft="10dp"
-                    android:layout_marginTop="5dp"/>、
+                    android:layout_below="@+id/card_message"
+                    android:layout_alignStart="@+id/textView2"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"/>、
                 <TextView
                     android:textSize="15sp"
-                    android:layout_below="@+id/textView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="送给：所有异地恋的朋友"
-                    android:id="@+id/textView2"
-                    android:layout_alignParentStart="true"
+                    android:id="@+id/to"
                     android:layout_marginLeft="10dp"
-                    android:layout_marginTop="5dp"/>
+                    android:layout_below="@+id/user"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"/>
+                <View
+                    android:id="@+id/Lines"
+                    android:layout_width="wrap_content"
+                    android:layout_height="1px"
+                    android:layout_below="@+id/to"
+                    android:background="@android:color/darker_gray"
+                    />
+
                 <TextView
                     android:textSize="15sp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="播放时间：05月11日 中午"
                     android:id="@+id/textView3"
-                    android:layout_below="@+id/textView2"
+                    android:layout_below="@+id/Lines"
                     android:layout_alignParentStart="true"
                     android:layout_marginLeft="10dp"
-                    android:layout_marginBottom="5dp"
-                    android:layout_marginTop="5dp"/>
+                    android:layout_marginTop="13dp"/>
 
                 <Button
 
@@ -93,9 +95,8 @@
                     android:layout_height="wrap_content"
                     android:text="未播放"
                     android:id="@+id/button"
-                    android:layout_alignBottom="@+id/textView3"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignTop="@+id/textView"/>
+                    android:layout_below="@+id/Lines"
+                    android:layout_alignEnd="@+id/Lines"/>
             </RelativeLayout>
 
         </RelativeLayout>

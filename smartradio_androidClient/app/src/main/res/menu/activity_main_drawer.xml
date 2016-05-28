@@ -3,6 +3,7 @@
 
     <group android:checkableBehavior="single">
         <item android:id="@+id/Today"
+              android:checked="true"
             android:title="今日点歌" />
         <item android:id="@+id/song"
             android:title="全部点歌" />
