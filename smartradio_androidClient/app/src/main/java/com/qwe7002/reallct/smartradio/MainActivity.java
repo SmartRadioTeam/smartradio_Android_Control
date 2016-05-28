@@ -1,6 +1,9 @@
 package com.qwe7002.reallct.smartradio;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.design.widget.NavigationView;
@@ -21,13 +24,16 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener
 {
+    ProgressDialog mpDialog;
     private RecyclerView recyclerView;
     private List<song> songList;
     private RecyclerViewAdapter adapter;
+    private SwipeRefreshLayout mSwipeRefreshWidget;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         Gson gson = new Gson();
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -43,20 +49,47 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         View header = navigationView.inflateHeaderView(R.layout.nav_header_main);
         TextView tv = (TextView) header.findViewById(R.id.navusername);
         tv.setText(public_value.username);
-        //// TODO: 2016/5/28
+        mSwipeRefreshWidget = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_widget);
         recyclerView= (RecyclerView) findViewById(R.id.my_recycler_view);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        initSongData();
-        adapter=new RecyclerViewAdapter(songList,MainActivity.this);
-        recyclerView.setHasFixedSize(true);
+        final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(adapter);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
 
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView,
+                                             int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    mSwipeRefreshWidget.setRefreshing(true);
+                    // 此处在现实项目中，请换成网络请求数据代码，sendRequest .....
+                    //handler.sendEmptyMessageDelayed(0, 3000);
+                    mSwipeRefreshWidget.setRefreshing(false);
+                }
+            }
+        });
+    }
+    private void showProgress(boolean switchs)
+    {
+        if(switchs)
+        {
+            mpDialog = new ProgressDialog(this);
+            mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            mpDialog.setTitle("正在连接服务器...");
+            mpDialog.setMessage("提交请求中，請稍候...");
+            mpDialog.setIndeterminate(false);
+            mpDialog.setCancelable(false);
+            mpDialog.show();
+        }else
+        {
+         mpDialog.hide();
+        }
     }
     private void initSongData() {
         songList =new ArrayList<>();
         songList.add(new song("追梦赤子心 - GALA","「真的超开心苏运营被提名金曲奖最佳女歌手，太棒了！不过竞争激励精彩。希望拿奖吧。希望明天回校听得到（实习狗）点歌于火车上」","27808044"));
-        songList.add(new song("追梦赤子心 - GALA","「真的超开心苏运营被提名金曲奖最佳女歌手，太棒了！不过竞争激励精彩。希望拿奖吧。希望明天回校听得到（实习狗）点歌于火车上」","81807"));
+        songList.add(new song("追梦赤子心 - GALA","「真的超开心苏运营被提名金曲奖最佳女歌手，太棒了！不过竞争激励精彩。希望拿奖吧。希望明天回校听得到（实习狗）点歌于火车上」","664962"));
     }
 
     @Override
@@ -95,8 +128,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onNavigationItemSelected(MenuItem item)
     {
         // Handle navigation view item clicks here.
-        int id = item.getItemId();
-        switch(id){
+        switch(item.getItemId()){
             case R.id.Today:
                 recyclerView= (RecyclerView) findViewById(R.id.my_recycler_view);
                 LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -107,26 +139,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 recyclerView.setAdapter(adapter);
                 break;
         }
-        /*if (id == R.id.nav_camara)
-        {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery)
-        {
-
-        } else if (id == R.id.nav_slideshow)
-        {
-
-        } else if (id == R.id.nav_manage)
-        {
-
-        } else if (id == R.id.nav_share)
-        {
-
-        } else if (id == R.id.nav_send)
-        {
-
-        }
-*/
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
