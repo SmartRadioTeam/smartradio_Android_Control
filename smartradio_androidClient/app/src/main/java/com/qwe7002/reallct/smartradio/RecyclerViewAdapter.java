@@ -130,7 +130,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         builder.setPriority(Notification.PRIORITY_HIGH);
         builder.setContentIntent(contextIntent);
         Notification notification = builder.build();
-        notification.flags = Notification.FLAG_AUTO_CANCEL;
+        notification.flags = Notification.FLAG_NO_CLEAR;
         NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         manager.notify(1, notification);
     }

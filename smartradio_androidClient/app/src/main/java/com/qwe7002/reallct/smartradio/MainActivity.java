@@ -1,6 +1,8 @@
 package com.qwe7002.reallct.smartradio;
 
+import android.app.NotificationManager;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -30,6 +32,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private RecyclerViewAdapter adapter;
     private SwipeRefreshLayout mSwipeRefreshWidget;
     @Override
+    protected void onResume(){
+        super.onResume();
+        NotificationManager manager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+        manager.cancel(1);
+    }
+    @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         Gson gson = new Gson();
@@ -55,18 +63,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setHasFixedSize(true);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
-
+        songList =new ArrayList<>();
+        songList.add(new song("追梦赤子心 - GALA","「真的超开心苏运营被提名金曲奖最佳女歌手，太棒了！不过竞争激励精彩。希望拿奖吧。希望明天回校听得到（实习狗）点歌于火车上」","27808044"));
+        songList.add(new song("追梦赤子心 - GALA","「真的超开心苏运营被提名金曲奖最佳女歌手，太棒了！不过竞争激励精彩。希望拿奖吧。希望明天回校听得到（实习狗）点歌于火车上」","664962"));
+        adapter = new RecyclerViewAdapter(songList,this);
+        recyclerView.setAdapter(adapter);
+        mSwipeRefreshWidget.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
-            public void onScrollStateChanged(RecyclerView recyclerView,
-                                             int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                    mSwipeRefreshWidget.setRefreshing(true);
-                    // 此处在现实项目中，请换成网络请求数据代码，sendRequest .....
-                    //handler.sendEmptyMessageDelayed(0, 3000);
-                    mSwipeRefreshWidget.setRefreshing(false);
-                }
+            public void onRefresh()
+            {
+                mSwipeRefreshWidget.setRefreshing(true);
+                //addinfo
             }
         });
     }
@@ -85,11 +92,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         {
          mpDialog.hide();
         }
-    }
-    private void initSongData() {
-        songList =new ArrayList<>();
-        songList.add(new song("追梦赤子心 - GALA","「真的超开心苏运营被提名金曲奖最佳女歌手，太棒了！不过竞争激励精彩。希望拿奖吧。希望明天回校听得到（实习狗）点歌于火车上」","27808044"));
-        songList.add(new song("追梦赤子心 - GALA","「真的超开心苏运营被提名金曲奖最佳女歌手，太棒了！不过竞争激励精彩。希望拿奖吧。希望明天回校听得到（实习狗）点歌于火车上」","664962"));
     }
 
     @Override
@@ -132,10 +134,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.Today:
                 recyclerView= (RecyclerView) findViewById(R.id.my_recycler_view);
                 LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-                initSongData();
                 adapter=new RecyclerViewAdapter(songList,MainActivity.this);
-                recyclerView.setHasFixedSize(true);
-                recyclerView.setLayoutManager(layoutManager);
                 recyclerView.setAdapter(adapter);
                 break;
         }
