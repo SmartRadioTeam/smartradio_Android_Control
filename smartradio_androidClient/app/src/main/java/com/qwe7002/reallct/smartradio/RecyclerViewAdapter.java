@@ -4,6 +4,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -27,7 +28,7 @@ import java.util.List;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.songtabletViewHolder>
 {
-
+    ProgressDialog mpDialog;
     private List<song> songtable;
     private Context context;
 
@@ -61,7 +62,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     @Override
     public RecyclerViewAdapter.songtabletViewHolder onCreateViewHolder(ViewGroup viewGroup, int i)
     {
-        View v = LayoutInflater.from(context).inflate(R.layout.cardview, viewGroup, false);
+        View v = LayoutInflater.from(context).inflate(R.layout.cardview_songtable, viewGroup, false);
         songtabletViewHolder nvh = new songtabletViewHolder(v);
         return nvh;
     }
@@ -72,6 +73,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         final int j = i;
         personViewHolder.card_title.setText(songtable.get(i).getTitle());
         personViewHolder.card_message.setText(songtable.get(i).getmessage());
+        setbuttonstate(personViewHolder.checkbutton,songtable.get(i).gettaskstate());
         personViewHolder.cardView.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -88,17 +90,24 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                                     @Override
                                     public void onClick(DialogInterface dialog, int which)
                                     {
+                                        pushnotify(context,"Smartradio管理系统正在运行","点击此处返回");
                                         Uri uri;
                                         if (isPkgInstalled("com.netease.cloudmusic"))
                                         {
-                                            pushnotify(context,"Smartradio管理系统正在运行","点击此处返回");
                                             uri = Uri.parse("orpheus://song/" + songtable.get(j).getsongid());
                                         }
                                         else
                                         {
                                             Toast.makeText(context, "未找到网易云音乐，请先下载安装！", Toast.LENGTH_SHORT).show();
-                                            pushnotify(context,"Smartradio管理系统正在运行","点击此处返回");
-                                            uri = Uri.parse("http://music.163.com/m/");
+                                            uri = Uri.parse("market://details?id=com.netease.cloudmusic");
+                                            Intent goToMarket = new Intent(Intent.ACTION_VIEW, uri);
+                                            try {
+                                                context.startActivity(goToMarket);
+                                                return;
+                                            } catch (ActivityNotFoundException e) {
+                                                uri = Uri.parse("http://music.163.com/m/");
+                                            }
+
                                         }
                                         Intent it = new Intent(Intent.ACTION_VIEW, uri);
                                         context.startActivity(it);
@@ -121,31 +130,63 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 @Override
                 public void onClick(View v)
                     {
-                        final View views = v;
+                        final View views =v;
                         AlertDialog.Builder builder= new AlertDialog.Builder(context);
 
-                        builder.setTitle("将该条目设为：")
+                        builder.setTitle("更改状态为：")
                                 .setItems(charSequences, new DialogInterface.OnClickListener() {
 
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
+                                        //showProgress(true);
                                         switch(which)
                                             {
                                                 case 0:
-                                                    //views.setBackgroundColor();
                                                     break;
                                                 case 1:
                                                     break;
                                                 case 2:
                                                     break;
                                             }
-
+                                        setbuttonstate((Button) views,which);
                                     }
                                 }).show();
                     }
             });
 
     }
+    void setbuttonstate(Button v,int state){
+        switch(state){
+            case 0:
+                v.setText("已播放");
+                v.setBackgroundResource(R.drawable.button_played);
+                break;
+            case 1:
+                v.setText("无法播放");
+                v.setBackgroundResource(R.drawable.button_unplay);
+                break;
+            case 2:
+                v.setText("未播放");
+                v.setBackgroundResource(R.drawable.button_normal);
+                break;
+        }
+    }
+    private void showProgress(boolean switchs)
+        {
+            if(switchs)
+                {
+                    mpDialog = new ProgressDialog(context);
+                    mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                    mpDialog.setTitle("正在连接服务器...");
+                    mpDialog.setMessage("提交请求中，请稍候...");
+                    mpDialog.setIndeterminate(false);
+                    mpDialog.setCancelable(false);
+                    mpDialog.show();
+                }else
+                {
+                    mpDialog.hide();
+                }
+        }
     void pushnotify(Context context,String title,String text){
         Notification.Builder builder = new Notification.Builder(context);
         builder.setSmallIcon(R.mipmap.ic_launcher);
