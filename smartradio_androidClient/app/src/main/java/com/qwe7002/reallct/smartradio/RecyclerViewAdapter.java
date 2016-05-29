@@ -3,6 +3,7 @@ package com.qwe7002.reallct.smartradio;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -44,13 +45,14 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         CardView cardView;
         TextView card_title;
         TextView card_message;
-
+        Button checkbutton;
         public songtabletViewHolder(final View itemView)
         {
             super(itemView);
             cardView = (CardView) itemView.findViewById(R.id.card_view);
             card_title = (TextView) itemView.findViewById(R.id.card_title);
             card_message = (TextView) itemView.findViewById(R.id.card_message);
+            checkbutton =(Button) itemView.findViewById(R.id.Checkbotton);
         }
 
 
@@ -68,7 +70,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public void onBindViewHolder(RecyclerViewAdapter.songtabletViewHolder personViewHolder, int i)
     {
         final int j = i;
-
         personViewHolder.card_title.setText(songtable.get(i).getTitle());
         personViewHolder.card_message.setText(songtable.get(i).getmessage());
         personViewHolder.cardView.setOnClickListener(new View.OnClickListener()
@@ -114,7 +115,35 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
             }
         });
+        personViewHolder.checkbutton.setOnClickListener(new View.OnClickListener()
+            {
+                final CharSequence[] charSequences = {"已播放","无法播放","未播放"};
+                @Override
+                public void onClick(View v)
+                    {
+                        final View views = v;
+                        AlertDialog.Builder builder= new AlertDialog.Builder(context);
 
+                        builder.setTitle("将该条目设为：")
+                                .setItems(charSequences, new DialogInterface.OnClickListener() {
+
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        switch(which)
+                                            {
+                                                case 0:
+                                                    //views.setBackgroundColor();
+                                                    break;
+                                                case 1:
+                                                    break;
+                                                case 2:
+                                                    break;
+                                            }
+
+                                    }
+                                }).show();
+                    }
+            });
 
     }
     void pushnotify(Context context,String title,String text){

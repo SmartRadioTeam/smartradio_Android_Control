@@ -247,7 +247,7 @@ public class LoginActivity extends AppCompatActivity
         mpDialog = new ProgressDialog(this);
         mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         mpDialog.setTitle("正在连接服务器...");
-        mpDialog.setMessage("登入中，請稍候...");
+        mpDialog.setMessage("登录中，请稍后...");
         mpDialog.setIndeterminate(false);
         mpDialog.setCancelable(false);
         mpDialog.show();

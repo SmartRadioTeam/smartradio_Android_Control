@@ -90,11 +90,10 @@
                     android:layout_marginTop="13dp"/>
 
                 <Button
-
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="未播放"
-                    android:id="@+id/button"
+                    android:id="@+id/Checkbotton"
                     android:layout_below="@+id/Lines"
                     android:layout_alignEnd="@+id/Lines"/>
             </RelativeLayout>
