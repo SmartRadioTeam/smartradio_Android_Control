@@ -3,6 +3,7 @@ package com.qwe7002.reallct.smartradio;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -26,7 +27,6 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener
 {
-    ProgressDialog mpDialog;
     private RecyclerView recyclerView;
     private List<song> songList;
     private RecyclerViewAdapter adapter;
@@ -79,22 +79,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
     }
-    private void showProgress(boolean switchs)
-    {
-        if(switchs)
-        {
-            mpDialog = new ProgressDialog(this);
-            mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            mpDialog.setTitle("正在连接服务器...");
-            mpDialog.setMessage("提交请求中，请稍候...");
-            mpDialog.setIndeterminate(false);
-            mpDialog.setCancelable(false);
-            mpDialog.show();
-        }else
-        {
-         mpDialog.hide();
-        }
-    }
 
     @Override
     public void onBackPressed()
@@ -122,6 +106,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = item.getItemId();
         if (id == R.id.action_settings)
         {
+            Intent intent = new Intent(this,settingActivity.class);
+            startActivity(intent);
             return true;
         }
         return super.onOptionsItemSelected(item);
