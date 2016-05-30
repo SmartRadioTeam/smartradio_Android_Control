@@ -39,7 +39,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 this.context = context;
             }
 
-
         //自定义ViewHolder类
         static class songtabletViewHolder extends RecyclerView.ViewHolder
             {
