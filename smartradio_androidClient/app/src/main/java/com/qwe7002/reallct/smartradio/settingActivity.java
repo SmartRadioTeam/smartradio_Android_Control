@@ -31,5 +31,10 @@ public class settingActivity extends AppCompatActivity
                         finish();
                     }
             };
+        @Override
+        public void onBackPressed(){
+
+            super.onBackPressed();
+        }
 
     }

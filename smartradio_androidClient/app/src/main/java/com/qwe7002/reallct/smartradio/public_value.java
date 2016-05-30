@@ -8,4 +8,5 @@ public class public_value
     public static String HostURl;
     public static String sessionid;
     public static String username;
+    public static String remotecontext;
 }

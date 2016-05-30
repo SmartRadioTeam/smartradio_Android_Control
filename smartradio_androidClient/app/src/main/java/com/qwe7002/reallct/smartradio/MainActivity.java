@@ -32,6 +32,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private RecyclerViewAdapter adapter;
     private SwipeRefreshLayout mSwipeRefreshWidget;
     @Override
+    protected void onStop(){
+        NotificationManager manager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+        manager.cancel(1);
+        super.onStop();
+    }
+    @Override
     protected void onResume(){
         super.onResume();
         NotificationManager manager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -40,8 +46,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-        Gson gson = new Gson();
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -64,11 +68,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setHasFixedSize(true);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        songList =new ArrayList<>();
-        songList.add(new song("追梦赤子心 - GALA","「真的超开心苏运营被提名金曲奖最佳女歌手，太棒了！不过竞争激励精彩。希望拿奖吧。希望明天回校听得到（实习狗）点歌于火车上」","27808044",1));
-        songList.add(new song("追梦赤子心 - GALA","「真的超开心苏运营被提名金曲奖最佳女歌手，太棒了！不过竞争激励精彩。希望拿奖吧。希望明天回校听得到（实习狗）点歌于火车上」","664962",0));
-        adapter = new RecyclerViewAdapter(songList,this);
-        recyclerView.setAdapter(adapter);
         mSwipeRefreshWidget.setColorSchemeResources(R.color.colorPrimary);
         mSwipeRefreshWidget.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -103,8 +102,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
-        int id = item.getItemId();
-        if (id == R.id.action_settings)
+        if (item.getItemId()== R.id.action_settings)
         {
             Intent intent = new Intent(this,settingActivity.class);
             startActivity(intent);
@@ -120,10 +118,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Handle navigation view item clicks here.
         switch(item.getItemId()){
             case R.id.Today:
-                recyclerView= (RecyclerView) findViewById(R.id.my_recycler_view);
-                LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-                adapter=new RecyclerViewAdapter(songList,MainActivity.this);
+                adapter=new RecyclerViewAdapter( songList,MainActivity.this);
                 recyclerView.setAdapter(adapter);
+                break;
+            case R.id.song:
+                break;
+            case R.id.nav_laf:
                 break;
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
