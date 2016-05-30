@@ -12,6 +12,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
@@ -130,11 +131,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 personViewHolder.checkbutton.setOnClickListener(new View.OnClickListener()
                     {
                         final CharSequence[] charSequences = {"已播放", "无法播放", "未播放"};
-
                         @Override
                         public void onClick(View v)
                             {
-                                final View views = v;
+                                final Button views = (Button) v;
                                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                                 builder.setTitle("更改状态为：")
                                         .setItems(charSequences, new DialogInterface.OnClickListener()
@@ -153,7 +153,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                                                                 case 2:
                                                                     break;
                                                             }
-                                                        setbuttonstate((Button) views, which);
+                                                        setbuttonstate(views, which);
+                                                        Snackbar.make(views, "条目已被设为" + views.getText(), Snackbar.LENGTH_SHORT)
+                                                                .show();
                                                     }
                                             }).show();
                             }
@@ -163,24 +165,43 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
         void setbuttonstate(Button v, int state)
             {
+                boolean systemflag=false;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                   systemflag=true;
+                }
                 switch (state)
                     {
                         case 0:
                             v.setText("已播放");
-                            v.setBackgroundResource(R.drawable.button_played);
+                            if(systemflag)
+                            {
+                                v.setBackgroundResource(R.drawable.button_played);
+                            }else{
+                                v.setBackgroundResource(R.color.played_button);
+                            }
                             break;
                         case 1:
                             v.setText("无法播放");
-                            v.setBackgroundResource(R.drawable.button_unplay);
+                            if(systemflag)
+                            {
+                                v.setBackgroundResource(R.drawable.button_unplay);
+                            }else{
+                                v.setBackgroundResource(R.color.no_button);
+                            }
                             break;
                         case 2:
                             v.setText("未播放");
-                            v.setBackgroundResource(R.drawable.button_normal);
+                            if(systemflag)
+                            {
+                                v.setBackgroundResource(R.drawable.button_normal);
+                            }else{
+
+                                v.setBackgroundResource(R.color.normal_button);
+                            }
+
                             break;
                     }
-                Snackbar
-                        .make(v, "条目已被设为" + v.getText(), Snackbar.LENGTH_SHORT)
-                        .show();
+
             }
 
         private void showProgress(boolean switchs)
