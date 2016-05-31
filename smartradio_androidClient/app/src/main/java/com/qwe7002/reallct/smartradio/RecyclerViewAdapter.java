@@ -10,14 +10,18 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -30,17 +34,19 @@ import java.util.List;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.songtabletViewHolder>
     {
+        private ActionMode actionMode;
         ProgressDialog mpDialog;
         private List<song> songtable;
         private Context context;
         private boolean onmuilt;
         private List Selectlist;
-        public RecyclerViewAdapter(List<song> songtable, Context context)
+        private Toolbar toolbar;
+        public RecyclerViewAdapter(List<song> songtable, Context context,Toolbar toolbar)
             {
                 this.songtable = songtable;
                 this.context = context;
+                this.toolbar = toolbar;
             }
-
         //自定义ViewHolder类
         static class songtabletViewHolder extends RecyclerView.ViewHolder
             {
@@ -61,6 +67,35 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
 
             }
+        private ActionMode.Callback mCallback = new ActionMode.Callback() {
+
+            @Override
+            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                return false;
+            }
+
+            @Override
+            public void onDestroyActionMode(ActionMode mode) {
+                // TODO Auto-generated method stub
+            }
+
+            @Override
+            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                MenuInflater inflater = mode.getMenuInflater();
+                inflater.inflate(R.menu.muiltselect, menu);
+                return true;
+            }
+
+            @Override
+            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                boolean ret = false;
+                if (item.getItemId() == R.id.muilt_normal) {
+                    mode.finish();
+                    ret = true;
+                }
+                return ret;
+            }
+        };
 
         @Override
         public RecyclerViewAdapter.songtabletViewHolder onCreateViewHolder(ViewGroup viewGroup, int i)
@@ -77,12 +112,26 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 personViewHolder.card_title.setText(songtable.get(i).getTitle());
                 personViewHolder.card_message.setText(songtable.get(i).getmessage());
                 setbuttonstate(personViewHolder.checkbutton, songtable.get(i).gettaskstate());
-                notifyItemInserted(i);
+                personViewHolder.cardView.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v)
+                    {
+                        if(actionMode!=null){
+                            return false;
+                        }
+                        toolbar.startActionMode(mCallback);
+                        return true;
+                    }
+                });
+                //notifyItemInserted(i);
                 personViewHolder.cardView.setOnClickListener(new View.OnClickListener()
                     {
                         @Override
                         public void onClick(View v)
                             {
+                                if(actionMode!=null){
+                                    return;
+                                }
                                 Uri uri;
                                 if (isPkgInstalled("com.netease.cloudmusic"))
                                     {

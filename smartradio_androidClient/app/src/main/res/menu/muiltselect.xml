@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/muilt_played" android:title="设为已播放" />
+    <item android:id="@+id/muilt_unplay" android:title="设为无法播放" />
+    <item android:id="@+id/muilt_normal" android:title="设为未播放" />
+</menu>
