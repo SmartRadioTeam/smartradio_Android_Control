@@ -76,7 +76,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
             @Override
             public void onDestroyActionMode(ActionMode mode) {
-                // TODO Auto-generated method stub
+                actionMode=null;
+
             }
 
             @Override
@@ -120,6 +121,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                             return false;
                         }
                         toolbar.startActionMode(mCallback);
+                        setselct(v,j);
                         return true;
                     }
                 });
@@ -130,6 +132,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                         public void onClick(View v)
                             {
                                 if(actionMode!=null){
+                                    setselct(v,j);
                                     return;
                                 }
                                 Uri uri;
@@ -214,6 +217,17 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
             }
 
+        private void setselct(View v,int i) {
+            if(!Selectlist.contains(i)){
+                Selectlist.add(i);
+                setbuttonstate((Button)v, 3);
+            }else{
+                setbuttonstate((Button)v, songtable.get(i).gettaskstate());
+                Selectlist.remove((Object)i);
+            }
+
+        }
+
         void setbuttonstate(Button v, int state)
             {
                 boolean systemflag=false;
@@ -248,6 +262,16 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                             }else{
 
                                 v.setBackgroundResource(R.color.normal_button);
+                            }
+                            break;
+                        case 3:
+                            v.setText("已选中");
+                            if(systemflag)
+                            {
+                                v.setBackgroundResource(R.drawable.button_select);
+                            }else{
+
+                                v.setBackgroundResource(R.color.select_button);
                             }
                             break;
                     }
