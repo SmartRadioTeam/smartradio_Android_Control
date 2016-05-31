@@ -30,16 +30,17 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.songtabletViewHolder>
     {
-        private ActionMode actionMode;
+        private boolean actionMode;
         ProgressDialog mpDialog;
         private List<song> songtable;
         private Context context;
-        private List Selectlist;
-        private List<View> Selectview;
+        private ArrayList Selectlist;
+        private ArrayList Selectview;
         private Toolbar toolbar;
         public RecyclerViewAdapter(List<song> songtable, Context context,Toolbar toolbar)
             {
@@ -77,7 +78,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             @Override
             public void onDestroyActionMode(ActionMode mode) {
                 int count = 0;
-                for (View i:Selectview)
+                for (Object i:Selectview)
                 {
 
                     setbuttonstate((Button)i,songtable.get((int)Selectlist.get(count)).gettaskstate());
@@ -85,7 +86,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 }
                 Selectview=null;
                 Selectlist=null;
-                actionMode=null;
+                actionMode=false;
 
             }
 
@@ -101,8 +102,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 final MenuItem itemfinal = item;
                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
                 alertDialog
-                        .setTitle("是否打开网易云音乐？")
-                        .setMessage("")
+                        .setTitle("您是否要执行此操作？")
+                        .setMessage("选中项将根据您的设定被修改。findViewById(R.id.Checkbotton)")
                         .setPositiveButton("确定",
                                 new DialogInterface.OnClickListener()
                                 {
@@ -152,11 +153,14 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                     @Override
                     public boolean onLongClick(View v)
                     {
-                        if(actionMode!=null){
+                        if(actionMode){
                             return false;
                         }
+                        Selectlist=new ArrayList();
+                        Selectview=new ArrayList();
+                        actionMode=true;
                         toolbar.startActionMode(mCallback);
-                        setselect(v,j);
+                        setselect(v.findViewById(R.id.Checkbotton),j);
                         return true;
                     }
                 });
@@ -166,8 +170,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                         @Override
                         public void onClick(View v)
                             {
-                                if(actionMode!=null){
-                                    setselect(v,j);
+                                if(actionMode){
+                                    setselect(v.findViewById(R.id.Checkbotton),j);
                                     return;
                                 }
                                 Uri uri;
@@ -258,7 +262,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 Selectlist.add(i);
                 setbuttonstate((Button)v, 3);
             }else{
-                setbuttonstate((Button)v, songtable.get(i).gettaskstate());
+                setbuttonstate((Button) Selectview.get(i), songtable.get(i).gettaskstate());
                 Selectview.remove(v);
                 Selectlist.remove((Object)i);
             }
