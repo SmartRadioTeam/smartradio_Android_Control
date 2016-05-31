@@ -38,8 +38,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         ProgressDialog mpDialog;
         private List<song> songtable;
         private Context context;
-        private boolean onmuilt;
         private List Selectlist;
+        private List<View> Selectview;
         private Toolbar toolbar;
         public RecyclerViewAdapter(List<song> songtable, Context context,Toolbar toolbar)
             {
@@ -76,6 +76,15 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
             @Override
             public void onDestroyActionMode(ActionMode mode) {
+                int count = 0;
+                for (View i:Selectview)
+                {
+
+                    setbuttonstate((Button)i,songtable.get((int)Selectlist.get(count)).gettaskstate());
+                    count++;
+                }
+                Selectview=null;
+                Selectlist=null;
                 actionMode=null;
 
             }
@@ -89,12 +98,38 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
             @Override
             public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-                boolean ret = false;
-                if (item.getItemId() == R.id.muilt_normal) {
-                    mode.finish();
-                    ret = true;
-                }
-                return ret;
+                final MenuItem itemfinal = item;
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
+                alertDialog
+                        .setTitle("是否打开网易云音乐？")
+                        .setMessage("")
+                        .setPositiveButton("确定",
+                                new DialogInterface.OnClickListener()
+                                {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which)
+                                    {
+                                        switch(itemfinal.getItemId())
+                                        {
+                                            case R.id.muilt_normal:
+                                                break;
+                                            case R.id.muilt_played:
+                                                break;
+                                            case R.id.muilt_unplay:
+                                                break;
+                                        }
+                                    }
+                                })
+                        .setNegativeButton("取消",
+                                new DialogInterface.OnClickListener()
+                                {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which)
+                                    {
+                                    }
+                                }).setCancelable(false).create().show();
+                mode.finish();
+                return true;
             }
         };
 
@@ -121,7 +156,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                             return false;
                         }
                         toolbar.startActionMode(mCallback);
-                        setselct(v,j);
+                        setselect(v,j);
                         return true;
                     }
                 });
@@ -132,7 +167,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                         public void onClick(View v)
                             {
                                 if(actionMode!=null){
-                                    setselct(v,j);
+                                    setselect(v,j);
                                     return;
                                 }
                                 Uri uri;
@@ -217,12 +252,14 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
             }
 
-        private void setselct(View v,int i) {
+        private void setselect(View v,int i) {
             if(!Selectlist.contains(i)){
+                Selectview.add(v);
                 Selectlist.add(i);
                 setbuttonstate((Button)v, 3);
             }else{
                 setbuttonstate((Button)v, songtable.get(i).gettaskstate());
+                Selectview.remove(v);
                 Selectlist.remove((Object)i);
             }
 
