@@ -24,6 +24,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -32,7 +33,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         ProgressDialog mpDialog;
         private List<song> songtable;
         private Context context;
-
+        private boolean onmuilt;
+        private List Selectlist;
         public RecyclerViewAdapter(List<song> songtable, Context context)
             {
                 this.songtable = songtable;
@@ -75,6 +77,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 personViewHolder.card_title.setText(songtable.get(i).getTitle());
                 personViewHolder.card_message.setText(songtable.get(i).getmessage());
                 setbuttonstate(personViewHolder.checkbutton, songtable.get(i).gettaskstate());
+                notifyItemInserted(i);
                 personViewHolder.cardView.setOnClickListener(new View.OnClickListener()
                     {
                         @Override
@@ -197,7 +200,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
                                 v.setBackgroundResource(R.color.normal_button);
                             }
-
                             break;
                     }
 

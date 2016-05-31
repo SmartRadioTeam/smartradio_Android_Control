@@ -276,13 +276,7 @@ public class LoginActivity extends AppCompatActivity
             {
                 //// TODO: 2016/5/28
                 String result = APIs.Login(mEmail,mPassword);
-                Gson gson = new Gson();
-                Json_LoginResult LoginResult = gson.fromJson(result, Json_LoginResult.class);
-                if (!LoginResult.getmod())
-                {
-                    return false;
-                }
-                public_value.sessionid = LoginResult.getSessionid();
+                //public_value.sessionid = LoginResult.getSessionid();
                 public_value.username = mEmail;
             } catch (Exception e)
             {
