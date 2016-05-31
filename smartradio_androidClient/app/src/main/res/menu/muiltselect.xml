@@ -3,4 +3,5 @@
     <item android:id="@+id/muilt_played" android:title="设为已播放" />
     <item android:id="@+id/muilt_unplay" android:title="设为无法播放" />
     <item android:id="@+id/muilt_normal" android:title="设为未播放" />
+    <item android:id="@+id/muilt_delete" android:title="删除条目" />
 </menu>

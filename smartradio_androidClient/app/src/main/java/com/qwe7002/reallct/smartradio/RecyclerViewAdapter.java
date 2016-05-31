@@ -17,6 +17,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -100,10 +101,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             @Override
             public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
                 final MenuItem itemfinal = item;
+                ArrayList templist = Selectlist;
+                Log.i("count","size:"+templist.size());
                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
                 alertDialog
                         .setTitle("您是否要执行此操作？")
-                        .setMessage("选中项将根据您的设定被修改。findViewById(R.id.Checkbotton)")
+                        .setMessage("选中项将根据您的设定被修改。")
                         .setPositiveButton("确定",
                                 new DialogInterface.OnClickListener()
                                 {
@@ -223,7 +226,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                     });
                 personViewHolder.checkbutton.setOnClickListener(new View.OnClickListener()
                     {
-                        final CharSequence[] charSequences = {"已播放", "无法播放", "未播放"};
+                        final CharSequence[] charSequences = {"已播放", "无法播放", "未播放","删除"};
                         @Override
                         public void onClick(View v)
                             {
@@ -312,7 +315,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                                 v.setBackgroundResource(R.drawable.button_select);
                             }else{
 
-                                v.setBackgroundResource(R.color.select_button);
+                                v.setBackgroundResource(R.color.colorPrimaryDark);
                             }
                             break;
                     }
