@@ -381,6 +381,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         @Override
         public int getItemCount()
             {
-                return songtable.size();
+                if(songtable!=null){
+                    return songtable.size();
+                }
+                return 0;
             }
     }
