@@ -2,10 +2,13 @@ package com.qwe7002.reallct.smartradio;
 
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -35,12 +38,19 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener
 {
+    refulshReceiver receiver = new refulshReceiver();
     private RecyclerView recyclerView;
     private List<song> songList;
     private RecyclerViewAdapter adapter;
     private SwipeRefreshLayout mSwipeRefreshWidget;
     Toolbar toolbar;
-
+    class refulshReceiver extends BroadcastReceiver{
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            adapter = new RecyclerViewAdapter(songList, MainActivity.this, toolbar);
+            recyclerView.setAdapter(adapter);
+        }
+    }
     @Override
     protected void onStop()
     {
@@ -53,8 +63,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onResume()
     {
         super.onResume();
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("refulsh.activity");
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filter);
         NotificationManager manager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
         manager.cancel(1);
+    }
+    @Override
+    protected void onPause(){
+        super.onPause();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
     }
 
     @Override
@@ -178,10 +197,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
-    private class getlist extends AsyncTask<Void, Integer, Boolean>
+    public class getlist extends AsyncTask<Void, Integer, Boolean>
     {
         ProgressDialog mpDialog = new ProgressDialog(MainActivity.this);
-        ;
 
         @Override
         protected void onPreExecute()

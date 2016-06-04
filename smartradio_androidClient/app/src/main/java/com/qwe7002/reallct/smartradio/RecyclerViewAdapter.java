@@ -13,6 +13,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -237,10 +238,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                     });
                 personViewHolder.checkbutton.setOnClickListener(new View.OnClickListener()
                     {
-                        final CharSequence[] charSequences = {"已播放", "无法播放", "未播放","删除"};
                         @Override
                         public void onClick(View v)
                             {
+                                CharSequence[] charSequences = {"已播放", "无法播放", "未播放","删除"};
                                 final Button views = (Button) v;
                                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                                 builder.setTitle("更改状态为：")
@@ -250,7 +251,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                                                 @Override
                                                 public void onClick(DialogInterface dialog, int which)
                                                     {
-                                                        //showProgress(true);
+                                                        if(which!=3)
+                                                        {
+                                                            Snackbar.make(views, "条目已被设为" + views.getText(), Snackbar.LENGTH_SHORT).show();
+                                                        }
                                                         switch (which)
                                                             {
                                                                 case 0:
@@ -260,15 +264,15 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                                                                     setbuttonstate(views, 2);
                                                                     break;
                                                                 case 2:
-                                                                    setbuttonstate(views, 3);
+                                                                    setbuttonstate(views, 0);
+                                                                    break;
+                                                                case 3:
+                                                                    songtable.remove(j);
+                                                                    Intent intent=new Intent();
+                                                                    intent.setAction("refulsh.activity");
+                                                                    LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
                                                                     break;
                                                             }
-                                                        if(which!=3)
-                                                        {
-
-                                                            Snackbar.make(views, "条目已被设为" + views.getText(), Snackbar.LENGTH_SHORT)
-                                                                    .show();
-                                                        }
                                                     }
                                             }).show();
                             }
