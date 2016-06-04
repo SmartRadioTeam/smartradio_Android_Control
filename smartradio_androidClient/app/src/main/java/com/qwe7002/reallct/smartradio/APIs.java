@@ -16,9 +16,14 @@ public class APIs
                 List<NameValuePair> Postinfo = new ArrayList<NameValuePair>(2);
                 Postinfo.add(new BasicNameValuePair("username", User));
                 Postinfo.add(new BasicNameValuePair("password", Passwd));
-                return Network.SendPost(public_value.HostURl + "/login.php", Postinfo);
+                return Network.SendPost(public_value.HostURl + "/api/admin_control/login.php", Postinfo);
 
             }
+        public static String getlistjson()
+        {
+            return Network.SendGet(public_value.HostURl + "/api/admin_control/index.php");
+
+        }
 
         public static String ItemsControl(String mode, String id)
             {

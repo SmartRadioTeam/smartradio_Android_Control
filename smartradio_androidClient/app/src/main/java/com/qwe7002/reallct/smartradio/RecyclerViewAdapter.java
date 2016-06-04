@@ -56,15 +56,22 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 CardView cardView;
                 TextView card_title;
                 TextView card_message;
+                TextView card_user;
+                TextView card_to;
+                TextView card_playtime;
                 Button checkbutton;
 
                 public songtabletViewHolder(final View itemView)
                     {
                         super(itemView);
-                        cardView = (CardView) itemView.findViewById(R.id.card_view);
-                        card_title = (TextView) itemView.findViewById(R.id.card_title);
-                        card_message = (TextView) itemView.findViewById(R.id.card_message);
-                        checkbutton = (Button) itemView.findViewById(R.id.Checkbotton);
+                        cardView = (CardView) itemView.findViewById(R.id.card_songtable_view);
+                        card_title = (TextView) itemView.findViewById(R.id.card_songtable_title);
+                        card_message = (TextView) itemView.findViewById(R.id.card_songtable_message);
+                        card_user = (TextView) itemView.findViewById(R.id.card_songtable_user);
+                        card_to = (TextView) itemView.findViewById(R.id.card_songtable_to);
+                        card_playtime = (TextView) itemView.findViewById(R.id.card_songtable_playtime);
+                        checkbutton = (Button) itemView.findViewById(R.id.card_songtable_Checkbotton);
+
                     }
 
 
@@ -151,7 +158,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 final int j = i;
                 personViewHolder.card_title.setText(songtable.get(i).getTitle());
                 personViewHolder.card_message.setText(songtable.get(i).getmessage());
+                personViewHolder.card_user.setText(songtable.get(i).getUser());
+                personViewHolder.card_playtime.setText(songtable.get(i).getPlaytime());
+                personViewHolder.card_to.setText(songtable.get(i).getTo());
                 setbuttonstate(personViewHolder.checkbutton, songtable.get(i).gettaskstate());
+
                 personViewHolder.cardView.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v)
@@ -243,15 +254,18 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                                                         switch (which)
                                                             {
                                                                 case 0:
+                                                                    setbuttonstate(views, 1);
                                                                     break;
                                                                 case 1:
+                                                                    setbuttonstate(views, 2);
                                                                     break;
                                                                 case 2:
+                                                                    setbuttonstate(views, 3);
                                                                     break;
                                                             }
                                                         if(which!=3)
                                                         {
-                                                            setbuttonstate(views, which);
+
                                                             Snackbar.make(views, "条目已被设为" + views.getText(), Snackbar.LENGTH_SHORT)
                                                                     .show();
                                                         }
@@ -283,7 +297,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 }
                 switch (state)
                     {
-                        case 0:
+                        case 1:
                             v.setText("已播放");
                             if(systemflag)
                             {
@@ -292,7 +306,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                                 v.setBackgroundResource(R.color.played_button);
                             }
                             break;
-                        case 1:
+                        case 2:
                             v.setText("无法播放");
                             if(systemflag)
                             {
@@ -301,7 +315,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                                 v.setBackgroundResource(R.color.no_button);
                             }
                             break;
-                        case 2:
+                        case 0:
                             v.setText("未播放");
                             if(systemflag)
                             {

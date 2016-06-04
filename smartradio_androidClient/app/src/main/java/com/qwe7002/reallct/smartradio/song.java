@@ -9,40 +9,42 @@ public class song implements Serializable{
     private String title;
     private String message;
     private String songid;
+    private String user;
+    private String to;
+    private String playtime;
     private int taskstate;
 
     /**
      * Constructs a new instance of {@code Object}.
      */
-    public song(String name, String message,String songid,int taskstate) {
-        this.title = name;
-        this.message = message;
+    public song(String title, String message,String user,String to,String playtime,String songid,int taskstate) {
+        this.title = title;
+        this.message = "「"+message+"」";
         this.songid = songid;
         this.taskstate = taskstate;
-    }
-    public void settaskstate(int taskstate) {
-        this.taskstate = taskstate;
+        this.user="点歌人："+user;
+        this.to="送给："+to;
+        this.playtime="播放时间："+playtime;
     }
     public int gettaskstate() {
         return taskstate;
     }
-    public void setmessage(String message) {
-        this.message = message;
-    }
-    public void setsongid(String songid) {
-        this.songid = songid;
-    }
-    public void setTitle(String title) {
-        this.title = title;
-    }
-    public String getsongid() {
-        return songid;
-    }
     public String getmessage() {
         return message;
     }
-
+    public String getUser() {
+        return user;
+    }
+    public String getTo() {
+        return to;
+    }
+    public String getPlaytime() {
+        return playtime;
+    }
     public String getTitle() {
         return title;
+    }
+    public String getsongid() {
+        return songid;
     }
 }
