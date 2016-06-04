@@ -249,9 +249,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                                                                 case 2:
                                                                     break;
                                                             }
-                                                        setbuttonstate(views, which);
-                                                        Snackbar.make(views, "条目已被设为" + views.getText(), Snackbar.LENGTH_SHORT)
-                                                                .show();
+                                                        if(which!=3)
+                                                        {
+                                                            setbuttonstate(views, which);
+                                                            Snackbar.make(views, "条目已被设为" + views.getText(), Snackbar.LENGTH_SHORT)
+                                                                    .show();
+                                                        }
                                                     }
                                             }).show();
                             }
