@@ -51,7 +51,7 @@ public class RecyclerViewAdapter_Laf extends RecyclerView.Adapter<RecyclerViewAd
                     {
                         super(itemView);
                         cardView = (CardView) itemView.findViewById(R.id.card_view);
-                        //card_title = (TextView) itemView.findViewById(R.id.card_title);
+                        //  card_title = (TextView) itemView.findViewById(R.id.card_title);
                         card_message = (TextView) itemView.findViewById(R.id.card_message);
                         checkbutton = (Button) itemView.findViewById(R.id.Checkbotton);
                     }

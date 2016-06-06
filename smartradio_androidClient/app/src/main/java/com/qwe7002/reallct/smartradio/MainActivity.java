@@ -4,12 +4,15 @@ import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -41,16 +44,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     refulshReceiver receiver = new refulshReceiver();
     private RecyclerView recyclerView;
     private List<song> songList;
+    private List<laf> lafList;
     private RecyclerViewAdapter adapter;
     private SwipeRefreshLayout mSwipeRefreshWidget;
     Toolbar toolbar;
-    class refulshReceiver extends BroadcastReceiver{
+
+    class refulshReceiver extends BroadcastReceiver
+    {
         @Override
-        public void onReceive(Context context, Intent intent) {
+        public void onReceive(Context context, Intent intent)
+        {
             adapter = new RecyclerViewAdapter(songList, MainActivity.this, toolbar);
             recyclerView.setAdapter(adapter);
         }
     }
+
     @Override
     protected void onStop()
     {
@@ -70,8 +78,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NotificationManager manager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
         manager.cancel(1);
     }
+
     @Override
-    protected void onPause(){
+    protected void onPause()
+    {
         super.onPause();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
     }
@@ -114,32 +124,40 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 
-    public void setSongList(JsonArray array, boolean today)
+    public void setSongList(boolean today)
     {
-        songList = new ArrayList<song>();
-        for (JsonElement jsonElement : array)
+        try
         {
-            JsonObject item = jsonElement.getAsJsonObject();
-            JsonObject songinfo = public_value.songinfo.get(item.get("songid").getAsString()).getAsJsonObject();
-            String time = item.get("time").getAsString().replace("-", "月") + "日 " + item.get("option").getAsString();
-            if (today)
+            songList = new ArrayList<song>();
+            int row = 0;
+            for (JsonElement jsonElement : public_value.songtable)
             {
-                SimpleDateFormat dateformat1 = new SimpleDateFormat("MM-dd");
-                String a1 = dateformat1.format(new Date());
-                if (a1 == item.get("time").getAsString())
+                JsonObject item = jsonElement.getAsJsonObject();
+                JsonObject songinfo = public_value.songinfo.get(item.get("songid").getAsString()).getAsJsonObject();
+                String time = item.get("time").getAsString().replace("-", "月") + "日 " + item.get("option").getAsString();
+                if (today)
                 {
-
-                    songList.add(new song(songinfo.get("songtitle").getAsString(), item.get("message").getAsString(), item.get("user").getAsString(), item.get("to").getAsString(), time, item.get("songid").getAsString(), Integer.parseInt(item.get("info").getAsString())));
+                    SimpleDateFormat dateformat1 = new SimpleDateFormat("MM-dd");
+                    String a1 = dateformat1.format(new Date());
+                    Log.i("today",a1);
+                    Log.i("playtime",item.get("time").getAsString());
+                    if (a1.equals(item.get("time").getAsString()))
+                    {
+                        songList.add(new song(row, songinfo.get("id").getAsInt(), songinfo.get("songtitle").getAsString(), item.get("message").getAsString(), item.get("user").getAsString(), item.get("to").getAsString(), time, item.get("songid").getAsString(), Integer.parseInt(item.get("info").getAsString())));
+                    }
+                } else
+                {
+                    songList.add(new song(row, songinfo.get("id").getAsInt(), songinfo.get("songtitle").getAsString(), item.get("message").getAsString(), item.get("user").getAsString(), item.get("to").getAsString(), time, item.get("songid").getAsString(), Integer.parseInt(item.get("info").getAsString())));
                 }
-            } else
-            {
-                songList.add(new song(songinfo.get("songtitle").getAsString(), item.get("message").getAsString(), item.get("user").getAsString(), item.get("to").getAsString(), time, item.get("songid").getAsString(), Integer.parseInt(item.get("info").getAsString())));
+                row++;
+
             }
-
-
+            adapter = new RecyclerViewAdapter(songList, MainActivity.this, toolbar);
+            recyclerView.setAdapter(adapter);
+        } catch (Exception e)
+        {
+            Log.i("exception", e.toString());
         }
-        adapter = new RecyclerViewAdapter(songList, MainActivity.this, toolbar);
-        recyclerView.setAdapter(adapter);
     }
 
     @Override
@@ -182,19 +200,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         switch (item.getItemId())
         {
             case R.id.Today:
-                public_value.navistate=0;
-                setSongList(public_value.songtable, true);
+                public_value.navistate = 0;
+                setSongList(true);
                 break;
             case R.id.song:
-                public_value.navistate=1;
-                setSongList(public_value.songtable, false);
+                public_value.navistate = 1;
+                setSongList(false);
                 break;
             case R.id.nav_laf:
+                setlostandfound();
                 break;
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void setlostandfound() {
+        lafList = new ArrayList<laf>();
+        for(JsonElement JE:public_value.laftable)
+        {
+            lafList.add(new laf());
+        }
     }
 
     public class getlist extends AsyncTask<Void, Integer, Boolean>
@@ -209,7 +236,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                 mpDialog.setTitle("正在连接服务器...");
-                mpDialog.setMessage("登录中，请稍后...");
+                mpDialog.setMessage("正在获取数据，请稍后...");
                 mpDialog.setIndeterminate(false);
                 mpDialog.setCancelable(false);
                 mpDialog.show();
@@ -236,25 +263,53 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         @Override
         protected void onPostExecute(Boolean result)
         {
-            if (result)
+            mSwipeRefreshWidget.setRefreshing(false);
+            mpDialog.cancel();
+            if (result && public_value.remotecontext != null)
             {
-                mSwipeRefreshWidget.setRefreshing(false);
-                mpDialog.cancel();
                 JsonParser parser = new JsonParser();
                 JsonObject object = (JsonObject) parser.parse(public_value.remotecontext);
                 public_value.songtable = object.getAsJsonArray("songtable");
                 public_value.songinfo = object.getAsJsonObject("songinfo");
                 public_value.laftable = object.getAsJsonArray("lostandfound");
-                switch(public_value.navistate){
+                switch (public_value.navistate)
+                {
                     case 0:
-                        setSongList(public_value.songtable, true);
+                        setSongList(true);
                         break;
                     case 1:
-                        setSongList(public_value.songtable, false);
+                        setSongList(false);
                         break;
-
+                    case 2:
+                        setlostandfound();
+                        break;
                 }
 
+            } else
+            {
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
+                alertDialog
+                        .setTitle("无法连接到网络！")
+                        .setMessage("是否进行重试？")
+                        .setPositiveButton("确定",
+                                new DialogInterface.OnClickListener()
+                                {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which)
+                                    {
+                                        Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                                        startActivity(intent);
+                                        finish();
+                                    }
+                                })
+                        .setNegativeButton("取消",
+                                new DialogInterface.OnClickListener()
+                                {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which)
+                                    {
+                                    }
+                                }).setCancelable(false).create().show();
             }
 
         }

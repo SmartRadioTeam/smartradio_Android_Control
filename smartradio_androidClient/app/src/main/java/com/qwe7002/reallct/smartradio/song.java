@@ -6,6 +6,8 @@ import java.io.Serializable;
  * Created by 江华 on 2016/5/28.
  */
 public class song implements Serializable{
+    private int row;
+    private int id;
     private String title;
     private String message;
     private String songid;
@@ -17,7 +19,9 @@ public class song implements Serializable{
     /**
      * Constructs a new instance of {@code Object}.
      */
-    public song(String title, String message,String user,String to,String playtime,String songid,int taskstate) {
+    public song(int row,int id,String title, String message,String user,String to,String playtime,String songid,int taskstate) {
+        this.row=row;
+        this.id=id;
         this.title = title;
         this.message = "「"+message+"」";
         this.songid = songid;
@@ -47,4 +51,6 @@ public class song implements Serializable{
     public String getsongid() {
         return songid;
     }
+    public int getrow(){return row;}
+    public int getid(){return id;}
 }

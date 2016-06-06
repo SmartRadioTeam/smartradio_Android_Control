@@ -267,6 +267,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                                                                     setbuttonstate(views, 0);
                                                                     break;
                                                                 case 3:
+                                                                    public_value.songtable.remove(songtable.get(j).getrow());
                                                                     songtable.remove(j);
                                                                     Intent intent=new Intent();
                                                                     intent.setAction("refulsh.activity");
