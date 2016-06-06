@@ -33,6 +33,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import org.json.JSONObject;
+
 import java.io.FileReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -220,7 +222,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         lafList = new ArrayList<laf>();
         for(JsonElement JE:public_value.laftable)
         {
-            lafList.add(new laf());
+            JsonObject item = JE.getAsJsonObject();
+            lafList.add(new laf(item.get("id").getAsInt(),item.get("title").getAsString(),item.get("message").getAsString()));
         }
     }
 
