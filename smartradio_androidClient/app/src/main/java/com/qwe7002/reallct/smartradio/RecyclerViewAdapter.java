@@ -31,6 +31,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -84,78 +85,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     }
 
-    private ActionMode.Callback mCallback = new ActionMode.Callback()
-    {
-
-        @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu)
-        {
-            return false;
-        }
-
-        @Override
-        public void onDestroyActionMode(ActionMode mode)
-        {
-            int count = 0;
-            for (Object i : Selectview)
-            {
-
-                setbuttonstate((Button) i, songtable.get((int) Selectlist.get(count)).gettaskstate());
-                count++;
-            }
-            Selectview = null;
-            Selectlist = null;
-            actionMode = false;
-
-        }
-
-        @Override
-        public boolean onCreateActionMode(ActionMode mode, Menu menu)
-        {
-            MenuInflater inflater = mode.getMenuInflater();
-            inflater.inflate(R.menu.muiltselect, menu);
-            return true;
-        }
-
-        @Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item)
-        {
-            final MenuItem itemfinal = item;
-            ArrayList templist = Selectlist;
-            Log.i("count", "size:" + templist.size());
-            AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
-            alertDialog
-                    .setTitle("您是否要执行此操作？")
-                    .setMessage("选中项将根据您的设定被修改。")
-                    .setPositiveButton("确定",
-                            new DialogInterface.OnClickListener()
-                            {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which)
-                                {
-                                    switch (itemfinal.getItemId())
-                                    {
-                                        case R.id.muilt_normal:
-                                            break;
-                                        case R.id.muilt_played:
-                                            break;
-                                        case R.id.muilt_unplay:
-                                            break;
-                                    }
-                                }
-                            })
-                    .setNegativeButton("取消",
-                            new DialogInterface.OnClickListener()
-                            {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which)
-                                {
-                                }
-                            }).setCancelable(false).create().show();
-            mode.finish();
-            return true;
-        }
-    };
 
     @Override
     public RecyclerViewAdapter.songtabletViewHolder onCreateViewHolder(ViewGroup viewGroup, int i)
@@ -189,7 +118,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 Selectview = new ArrayList();
                 actionMode = true;
                 toolbar.startActionMode(mCallback);
-                setselect(v.findViewById(R.id.Checkbotton), j);
+                setselect(v.findViewById(R.id.card_songtable_Checkbotton), j);
                 return true;
             }
         });
@@ -201,7 +130,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             {
                 if (actionMode)
                 {
-                    setselect(v.findViewById(R.id.Checkbotton), j);
+                    setselect(v.findViewById(R.id.card_songtable_Checkbotton), j);
                     return;
                 }
                 Uri uri;
@@ -270,28 +199,28 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                                 {
                                     Snackbar.make(views, "条目已被设为" + views.getText(), Snackbar.LENGTH_SHORT).show();
                                 }
-                                String mode="";
+                                String mode = "";
                                 switch (which)
                                 {
                                     case 0:
                                         setbuttonstate(views, 1);
-                                        mode="played";
+                                        mode = "played";
                                         break;
                                     case 1:
                                         setbuttonstate(views, 2);
-                                        mode="unplay";
+                                        mode = "unplay";
                                         break;
                                     case 2:
                                         setbuttonstate(views, 0);
-                                        mode="normalplay";
+                                        mode = "normalplay";
                                         break;
                                     case 3:
-                                        mode="delete";
+                                        mode = "delete";
                                         break;
                                 }
                                 Intent intent = new Intent();
                                 LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-                                new sendcontrol().execute("{'mode':'"+mode+"','id':"+songtable.get(j).getid()+"}");
+                                new sendcontrol().execute("{'mode':'" + mode + "','id':" + songtable.get(j).getid() + ",'submitmode':'single'}");
                             }
                         }).show();
             }
@@ -451,7 +380,13 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             {
                 JsonParser parser = new JsonParser();
                 JsonObject object = (JsonObject) parser.parse(params[0]);
-                return APIs.ItemsControl(object.get("mode").getAsString(), object.get("id").getAsString());
+                if (object.get("submitmode").getAsString().equals("muilt"))
+                {
+                    return APIs.ItemsControlMuilt(object.get("mode").getAsString(), object.get("id").getAsString());
+                } else
+                {
+                    return APIs.ItemsControl(object.get("mode").getAsString(), object.get("id").getAsString());
+                }
             } catch (Exception e)
             {
                 return null;
@@ -471,8 +406,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 {
                     return;
                 }
-
-
             } else
             {
                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
@@ -489,7 +422,92 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                                     }
                                 }).setCancelable(false).create().show();
             }
-
         }
     }
+    private ActionMode.Callback mCallback = new ActionMode.Callback()
+    {
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu)
+        {
+            return false;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode)
+        {
+            int count = 0;
+            for (Object i : Selectview)
+            {
+
+                setbuttonstate((Button) i, songtable.get((int) Selectlist.get(count)).gettaskstate());
+                count++;
+            }
+            Selectview = null;
+            Selectlist = null;
+            actionMode = false;
+
+        }
+
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu)
+        {
+            MenuInflater inflater = mode.getMenuInflater();
+            inflater.inflate(R.menu.muiltselect, menu);
+            return true;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item)
+        {
+            final MenuItem itemfinal = item;
+            final ArrayList templist = Selectlist;
+            Log.i("count", "size:" + templist.size());
+            AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
+            alertDialog
+                    .setTitle("您是否要执行此操作？")
+                    .setMessage("选中项将根据您的设定被修改。")
+                    .setPositiveButton("确定",
+                            new DialogInterface.OnClickListener()
+                            {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which)
+                                {
+                                    String mode = "";
+                                    switch (itemfinal.getItemId())
+                                    {
+                                        case R.id.muilt_played:
+                                            mode = "played";
+                                            break;
+                                        case R.id.muilt_unplay:
+                                            mode = "unplay";
+                                            break;
+                                        case R.id.muilt_normal:
+                                            mode = "normalplay";
+                                            break;
+                                        case R.id.muilt_delete:
+                                            mode = "delete";
+                                            break;
+                                    }
+                                    Intent intent = new Intent();
+                                    LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+                                    Gson gson = new Gson();
+                                    String muiltItemList = gson.toJson(templist);
+                                    new sendcontrol().execute("{'mode':'" + mode + "','id':" + muiltItemList + ",'submitmode':'muilt'}");
+
+                                }
+                            })
+                    .setNegativeButton("取消",
+                            new DialogInterface.OnClickListener()
+                            {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which)
+                                {
+                                }
+                            }).setCancelable(false).create().show();
+            mode.finish();
+            return true;
+        }
+    };
+
 }

@@ -40,7 +40,6 @@ public class LoginActivity extends AppCompatActivity
     private EditText mPasswordView;
     ProgressDialog mpDialog;
     SharedPreferences sharedPreferences;
-
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {

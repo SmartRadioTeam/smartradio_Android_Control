@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Switch;
 
 public class settingActivity extends AppCompatActivity
@@ -25,14 +26,18 @@ public class settingActivity extends AppCompatActivity
         toolbar.setNavigationOnClickListener(listener);
         toolbar.setNavigationIcon(R.drawable.ic_check_white_36dp);
         s = (Switch) findViewById(R.id.switch1);
-        if (public_value.settings.get("permission").getAsString().equals("0"))
+        try
         {
-            s.setChecked(false);
-        } else
-        {
-            s.setChecked(true);
-        }
-
+            if (public_value.settings.get("permission").getAsString().equals("0"))
+            {
+                s.setChecked(false);
+            } else
+            {
+                s.setChecked(true);
+            }
+            EditText edit = (EditText) findViewById(R.id.editText);
+            edit.setText(public_value.settings.get("notice").getAsString());
+        } catch (Exception e) {}
     }
 
     private View.OnClickListener listener = new View.OnClickListener()

@@ -1,5 +1,7 @@
 package com.qwe7002.reallct.smartradio;
 
+import com.google.gson.Gson;
+
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
@@ -21,8 +23,7 @@ public class APIs
 
     public static String getlistjson()
     {
-        return Network.SendGet(public_value.HostURl + "/api/admin_control/index.php");
-
+        return Network.SendGet(public_value.HostURl + "/api/admin_control/tableinfo.php");
     }
 
     public static String ItemsControl(String mode, String id)
@@ -33,8 +34,13 @@ public class APIs
         return Network.SendPost(public_value.HostURl + "/api/admin_control/items.php", Postinfo);
     }
 
-    public static String ItemsControlMuilt(String mode, ArrayList List)
+    public static String ItemsControlMuilt(String mode, String List)
     {
-        return null;
+        List<NameValuePair> Postinfo = new ArrayList<NameValuePair>(3);
+        Postinfo.add(new BasicNameValuePair("muilt", "true"));
+        Postinfo.add(new BasicNameValuePair("mode", mode));
+        Postinfo.add(new BasicNameValuePair("id", List));
+        return Network.SendPost(public_value.HostURl + "/api/admin_control/items.php", Postinfo);
+
     }
 }

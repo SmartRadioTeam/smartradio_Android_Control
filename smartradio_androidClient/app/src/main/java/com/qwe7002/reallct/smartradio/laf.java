@@ -7,6 +7,7 @@ import java.io.Serializable;
  */
 public class laf implements Serializable
 {
+    private int id;
     private String title;
     private String message;
 
@@ -15,9 +16,14 @@ public class laf implements Serializable
      */
     public laf(int id, String name, String message)
     {
+        this.id=id;
         this.title = name;
         this.message = message;
 
+    }
+    public int getid()
+    {
+        return id;
     }
 
     public String getmessage()
