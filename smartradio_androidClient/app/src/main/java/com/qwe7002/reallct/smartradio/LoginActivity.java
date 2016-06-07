@@ -40,6 +40,7 @@ public class LoginActivity extends AppCompatActivity
     private EditText mPasswordView;
     ProgressDialog mpDialog;
     SharedPreferences sharedPreferences;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -47,19 +48,19 @@ public class LoginActivity extends AppCompatActivity
         setContentView(R.layout.activity_login);
         try
         {
-            sharedPreferences= getSharedPreferences("Hostinfo", Context.MODE_PRIVATE);
+            sharedPreferences = getSharedPreferences("Hostinfo", Context.MODE_PRIVATE);
 
         } catch (Exception e)
         {
         }
         public_value.HostURl = sharedPreferences.getString("Hostinfo", null);
-        if (public_value.HostURl == null||public_value.HostURl.equals("http://")||public_value.HostURl.equals(""))
+        if (public_value.HostURl == null || public_value.HostURl.equals("http://") || public_value.HostURl.equals(""))
         {
 
-            final EditText text=new EditText(this);
+            final EditText text = new EditText(this);
             text.setText("http://");
             text.setMaxLines(1);
-            AlertDialog alertDialog=new AlertDialog.Builder(this).create();
+            AlertDialog alertDialog = new AlertDialog.Builder(this).create();
             alertDialog.setTitle("请输入服务器地址：");
             alertDialog.setView(text);
             alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "确定",
@@ -67,7 +68,7 @@ public class LoginActivity extends AppCompatActivity
                     {
                         public void onClick(DialogInterface dialog, int which)
                         {
-                            if(!text.getText().toString().equals("http://")||!text.getText().toString().equals(""))
+                            if (!text.getText().toString().equals("http://") || !text.getText().toString().equals(""))
                             {
                                 SharedPreferences.Editor editor = sharedPreferences.edit();
                                 editor.putString("Hostinfo", text.getText().toString());
@@ -76,14 +77,18 @@ public class LoginActivity extends AppCompatActivity
                             }
                         }
                     });
-            alertDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
+            alertDialog.setOnKeyListener(new DialogInterface.OnKeyListener()
+            {
 
                 @Override
-                public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
-                    if (keyCode == KeyEvent.KEYCODE_SEARCH || keyCode == KeyEvent.KEYCODE_BACK) {
+                public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event)
+                {
+                    if (keyCode == KeyEvent.KEYCODE_SEARCH || keyCode == KeyEvent.KEYCODE_BACK)
+                    {
                         return true;
                     }
-                    if (keyCode == KeyEvent.KEYCODE_ENTER) {
+                    if (keyCode == KeyEvent.KEYCODE_ENTER)
+                    {
                         return true;
                     }
                     return false;
@@ -274,7 +279,7 @@ public class LoginActivity extends AppCompatActivity
             try
             {
                 //// TODO: 2016/5/28
-                String result = APIs.Login(mEmail,mPassword);
+                String result = APIs.Login(mEmail, mPassword);
                 //public_value.sessionid = LoginResult.getSessionid();
                 public_value.username = mEmail;
             } catch (Exception e)

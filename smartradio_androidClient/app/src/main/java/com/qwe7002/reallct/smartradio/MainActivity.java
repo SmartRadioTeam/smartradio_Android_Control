@@ -10,6 +10,7 @@ import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
@@ -43,21 +44,21 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener
 {
-    refulshReceiver receiver = new refulshReceiver();
+    private refulshReceiver receiver = new refulshReceiver();
     private RecyclerView recyclerView;
     private List<song> songList;
     private List<laf> lafList;
     private RecyclerViewAdapter adapter;
     private SwipeRefreshLayout mSwipeRefreshWidget;
-    Toolbar toolbar;
+    private Toolbar toolbar;
+    private Boolean firstlaunch = true;
 
     class refulshReceiver extends BroadcastReceiver
     {
         @Override
         public void onReceive(Context context, Intent intent)
         {
-            adapter = new RecyclerViewAdapter(songList, MainActivity.this, toolbar);
-            recyclerView.setAdapter(adapter);
+            new getlist().execute();
         }
     }
 
@@ -141,8 +142,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 {
                     SimpleDateFormat dateformat1 = new SimpleDateFormat("MM-dd");
                     String a1 = dateformat1.format(new Date());
-                    Log.i("today",a1);
-                    Log.i("playtime",item.get("time").getAsString());
+                    Log.i("today", a1);
+                    Log.i("playtime", item.get("time").getAsString());
                     if (a1.equals(item.get("time").getAsString()))
                     {
                         songList.add(new song(row, songinfo.get("id").getAsInt(), songinfo.get("songtitle").getAsString(), item.get("message").getAsString(), item.get("user").getAsString(), item.get("to").getAsString(), time, item.get("songid").getAsString(), Integer.parseInt(item.get("info").getAsString())));
@@ -218,25 +219,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
-    private void setlostandfound() {
+    private void setlostandfound()
+    {
         lafList = new ArrayList<laf>();
-        for(JsonElement JE:public_value.laftable)
+        for (JsonElement JE : public_value.laftable)
         {
             JsonObject item = JE.getAsJsonObject();
-            lafList.add(new laf(item.get("id").getAsInt(),item.get("title").getAsString(),item.get("message").getAsString()));
+            lafList.add(new laf(item.get("id").getAsInt(), item.get("title").getAsString(), item.get("message").getAsString()));
         }
     }
 
-    public class getlist extends AsyncTask<Void, Integer, Boolean>
+    public class getlist extends AsyncTask<Void, Integer, String>
     {
         ProgressDialog mpDialog = new ProgressDialog(MainActivity.this);
 
         @Override
         protected void onPreExecute()
         {
-            if (public_value.remotecontext == null)
+            if (firstlaunch)
             {
-
+                firstlaunch = false;
                 mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                 mpDialog.setTitle("正在连接服务器...");
                 mpDialog.setMessage("正在获取数据，请稍后...");
@@ -250,31 +252,36 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         @Override
-        protected Boolean doInBackground(Void... params)
+        protected String doInBackground(Void... params)
         {
             try
             {
-                public_value.remotecontext = APIs.getlistjson();
-                return true;
+                return APIs.getlistjson();
+
             } catch (Exception e)
             {
-                return false;
+                return null;
             }
         }
 
 
         @Override
-        protected void onPostExecute(Boolean result)
+        protected void onPostExecute(String result)
         {
             mSwipeRefreshWidget.setRefreshing(false);
             mpDialog.cancel();
-            if (result && public_value.remotecontext != null)
+            if (result != null)
             {
                 JsonParser parser = new JsonParser();
-                JsonObject object = (JsonObject) parser.parse(public_value.remotecontext);
+                JsonObject object = (JsonObject) parser.parse(result);
                 public_value.songtable = object.getAsJsonArray("songtable");
                 public_value.songinfo = object.getAsJsonObject("songinfo");
                 public_value.laftable = object.getAsJsonArray("lostandfound");
+                //if(public_value.settings.get("permission").equals("0"))
+                //{
+                View v = (View) findViewById(R.id.main_layout);
+                Snackbar.make(v, "当前策略禁止点歌", Snackbar.LENGTH_SHORT).show();
+                //}
                 switch (public_value.navistate)
                 {
                     case 0:
