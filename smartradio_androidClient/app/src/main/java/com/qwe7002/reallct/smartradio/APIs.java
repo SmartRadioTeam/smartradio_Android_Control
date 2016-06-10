@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class APIs
 {
-    public static String sendsetting(String mode, String value)
+    public static String setsetting(String mode, String value)
     {
         List<NameValuePair> Postinfo = new ArrayList<NameValuePair>(4);
         Postinfo.add(new BasicNameValuePair("mode", mode));
