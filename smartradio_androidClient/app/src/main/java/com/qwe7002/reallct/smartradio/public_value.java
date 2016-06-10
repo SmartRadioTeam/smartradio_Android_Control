@@ -8,7 +8,7 @@ import com.google.gson.JsonObject;
  */
 public class public_value
 {
-    public static String HostURl = "http://192.168.10.250:9000";
+    public static String HostURl;
     public static String sessionid;
     public static String username;
     public static JsonArray songtable;

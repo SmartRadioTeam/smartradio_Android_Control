@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -29,14 +28,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import org.json.JSONObject;
-
-import java.io.FileReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -277,11 +272,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 public_value.songtable = object.getAsJsonArray("songtable");
                 public_value.songinfo = object.getAsJsonObject("songinfo");
                 public_value.laftable = object.getAsJsonArray("lostandfound");
-                //if(public_value.settings.get("permission").equals("0"))
-                //{
-                View v = (View) findViewById(R.id.main_layout);
-                Snackbar.make(v, "当前策略禁止点歌", Snackbar.LENGTH_SHORT).show();
-                //}
+                if (public_value.settings.get("permission").equals("0"))
+                {
+                    View v = findViewById(R.id.main_layout);
+                    Snackbar.make(v, "当前策略禁止点歌", Snackbar.LENGTH_SHORT).show();
+                }
                 switch (public_value.navistate)
                 {
                     case 0:

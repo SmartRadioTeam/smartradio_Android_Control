@@ -1,13 +1,8 @@
 package com.qwe7002.reallct.smartradio;
 
-import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Switch;
@@ -15,6 +10,7 @@ import android.widget.Switch;
 public class settingActivity extends AppCompatActivity
 {
     Switch s;
+    EditText edit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -35,7 +31,7 @@ public class settingActivity extends AppCompatActivity
             {
                 s.setChecked(true);
             }
-            EditText edit = (EditText) findViewById(R.id.editText);
+            edit = (EditText) findViewById(R.id.editText);
             edit.setText(public_value.settings.get("notice").getAsString());
         } catch (Exception e) {}
     }
@@ -52,7 +48,10 @@ public class settingActivity extends AppCompatActivity
     @Override
     public void onBackPressed()
     {
+        if (edit.getText().equals(public_value.settings.get("notice").getAsString()))
+        {
 
+        }
         super.onBackPressed();
     }
 
