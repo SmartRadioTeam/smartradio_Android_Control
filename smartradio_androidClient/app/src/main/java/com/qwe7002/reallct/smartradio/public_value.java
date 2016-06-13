@@ -3,9 +3,6 @@ package com.qwe7002.reallct.smartradio;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-/**
- * Created by 江华 on 2016/5/28.
- */
 public class public_value
 {
     public static String HostURl;

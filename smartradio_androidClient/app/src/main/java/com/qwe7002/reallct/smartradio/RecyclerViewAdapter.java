@@ -42,7 +42,7 @@ import java.util.List;
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.songtabletViewHolder>
 {
     private boolean actionMode;
-    ProgressDialog mpDialog;
+    private ProgressDialog mpDialog;
     private List<song> songtable;
     private Context context;
     private ArrayList Selectlist;
@@ -56,7 +56,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         this.toolbar = toolbar;
     }
 
-    //自定义ViewHolder类
     static class songtabletViewHolder extends RecyclerView.ViewHolder
     {
 
@@ -78,7 +77,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             card_to = (TextView) itemView.findViewById(R.id.card_songtable_to);
             card_playtime = (TextView) itemView.findViewById(R.id.card_songtable_playtime);
             checkbutton = (Button) itemView.findViewById(R.id.card_songtable_Checkbotton);
-
         }
 
 
@@ -103,7 +101,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         personViewHolder.card_playtime.setText(songtable.get(i).getPlaytime());
         personViewHolder.card_to.setText(songtable.get(i).getTo());
         setbuttonstate(personViewHolder.checkbutton, songtable.get(i).gettaskstate());
-
         personViewHolder.cardView.setOnLongClickListener(new View.OnLongClickListener()
         {
             @Override
@@ -399,6 +396,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             showProgress(false);
             if (result != null)
             {
+                Log.i("result",result);
                 JsonParser parser = new JsonParser();
                 JsonObject object = (JsonObject) parser.parse(result);
                 if (object.get("mod").getAsString().equals("success"))
@@ -423,6 +421,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             }
         }
     }
+
     private ActionMode.Callback mCallback = new ActionMode.Callback()
     {
 

@@ -1,13 +1,18 @@
 package com.qwe7002.reallct.smartradio;
 
+import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
+
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 public class settingActivity extends AppCompatActivity
 {
@@ -15,6 +20,7 @@ public class settingActivity extends AppCompatActivity
     EditText edit;
     Boolean switchchangestate = false;
     Boolean switchstate;
+    ProgressDialog mpDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -61,7 +67,7 @@ public class settingActivity extends AppCompatActivity
         @Override
         public void onClick(View v)
         {
-            finish();
+            new startsetsetting().execute();
         }
     };
 
@@ -81,7 +87,13 @@ public class settingActivity extends AppCompatActivity
         @Override
         protected void onPreExecute()
         {
-
+            mpDialog = new ProgressDialog(settingActivity.this);
+            mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            mpDialog.setTitle("正在连接服务器...");
+            mpDialog.setMessage("正在获取数据，请稍后...");
+            mpDialog.setIndeterminate(false);
+            mpDialog.setCancelable(false);
+            mpDialog.show();
             if (!edit.getText().equals(public_value.settings.get("notice").getAsString()))
             {
                 value = edit.getText().toString();
@@ -91,10 +103,10 @@ public class settingActivity extends AppCompatActivity
             {
                 if (switchstate)
                 {
-                    value = "1";
+                    permission = "1";
                 } else
                 {
-                    value = "0";
+                    permission = "0";
                 }
                 if (mode == 1)
                 {
@@ -114,17 +126,19 @@ public class settingActivity extends AppCompatActivity
                 switch (mode)
                 {
                     case 1:
-                        APIs.setsetting("notice", value);
+                        Log.i("setnotece",APIs.setsetting("notice", value));
                         break;
                     case 2:
-                        APIs.setsetting("permission", value);
+                        Log.i("setpermission",APIs.setsetting("permission", permission));
                         break;
                     case 3:
-                        APIs.setsetting("notice", value);
-                        APIs.setsetting("permission", permission);
+                        Log.i("setnotece",APIs.setsetting("notice", value));
+                        Log.i("setpermisson",APIs.setsetting("permission", permission));
                         break;
                 }
-
+                JsonParser parser = new JsonParser();
+                JsonObject jsonobj = (JsonObject) parser.parse(APIs.getsetting());
+                public_value.settings = jsonobj.get("settings").getAsJsonObject();
                 return true;
             } catch (Exception e)
             {
@@ -135,6 +149,8 @@ public class settingActivity extends AppCompatActivity
         @Override
         protected void onPostExecute(Boolean s)
         {
+            mpDialog.cancel();
+            finish();
         }
     }
 }

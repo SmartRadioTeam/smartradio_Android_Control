@@ -11,9 +11,6 @@ public class laf implements Serializable
     private String title;
     private String message;
 
-    /**
-     * Constructs a new instance of {@code Object}.
-     */
     public laf(int id, String name, String message)
     {
         this.id=id;

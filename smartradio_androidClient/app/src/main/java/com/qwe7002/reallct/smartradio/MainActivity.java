@@ -111,12 +111,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         mSwipeRefreshWidget.setColorSchemeResources(R.color.colorPrimary);
         new getlist().execute();
+        if (public_value.settings.get("permission").equals("0"))
+        {
+            View v = findViewById(R.id.main_layout);
+            Snackbar.make(v, "当前策略禁止点歌", Snackbar.LENGTH_SHORT).show();
+        }
         mSwipeRefreshWidget.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener()
         {
             @Override
             public void onRefresh()
             {
-
                 new getlist().execute();
             }
         });
@@ -137,15 +141,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 {
                     SimpleDateFormat dateformat1 = new SimpleDateFormat("MM-dd");
                     String a1 = dateformat1.format(new Date());
-                    Log.i("today", a1);
-                    Log.i("playtime", item.get("time").getAsString());
                     if (a1.equals(item.get("time").getAsString()))
                     {
-                        songList.add(new song(row, songinfo.get("id").getAsInt(), songinfo.get("songtitle").getAsString(), item.get("message").getAsString(), item.get("user").getAsString(), item.get("to").getAsString(), time, item.get("songid").getAsString(), Integer.parseInt(item.get("info").getAsString())));
+                        songList.add(new song(row, item.get("id").getAsInt(), songinfo.get("songtitle").getAsString(), item.get("message").getAsString(), item.get("user").getAsString(), item.get("to").getAsString(), time, item.get("songid").getAsString(), Integer.parseInt(item.get("info").getAsString())));
                     }
                 } else
                 {
-                    songList.add(new song(row, songinfo.get("id").getAsInt(), songinfo.get("songtitle").getAsString(), item.get("message").getAsString(), item.get("user").getAsString(), item.get("to").getAsString(), time, item.get("songid").getAsString(), Integer.parseInt(item.get("info").getAsString())));
+                    songList.add(new song(row, item.get("id").getAsInt(), songinfo.get("songtitle").getAsString(), item.get("message").getAsString(), item.get("user").getAsString(), item.get("to").getAsString(), time, item.get("songid").getAsString(), Integer.parseInt(item.get("info").getAsString())));
                 }
                 row++;
 
@@ -216,11 +218,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void setlostandfound()
     {
-        lafList = new ArrayList<laf>();
-        for (JsonElement JE : public_value.laftable)
+        try
         {
-            JsonObject item = JE.getAsJsonObject();
-            lafList.add(new laf(item.get("id").getAsInt(), item.get("title").getAsString(), item.get("message").getAsString()));
+            lafList = new ArrayList<laf>();
+            for (JsonElement JE : public_value.laftable)
+            {
+                JsonObject item = JE.getAsJsonObject();
+                lafList.add(new laf(item.get("id").getAsInt(), item.get("title").getAsString(), item.get("message").getAsString()));
+            }
+        } catch (Exception e)
+        {
+
         }
     }
 
@@ -267,16 +275,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             mpDialog.cancel();
             if (result != null)
             {
+                Log.i("result",result);
                 JsonParser parser = new JsonParser();
                 JsonObject object = (JsonObject) parser.parse(result);
                 public_value.songtable = object.getAsJsonArray("songtable");
                 public_value.songinfo = object.getAsJsonObject("songinfo");
                 public_value.laftable = object.getAsJsonArray("lostandfound");
-                if (public_value.settings.get("permission").equals("0"))
-                {
-                    View v = findViewById(R.id.main_layout);
-                    Snackbar.make(v, "当前策略禁止点歌", Snackbar.LENGTH_SHORT).show();
-                }
                 switch (public_value.navistate)
                 {
                     case 0:

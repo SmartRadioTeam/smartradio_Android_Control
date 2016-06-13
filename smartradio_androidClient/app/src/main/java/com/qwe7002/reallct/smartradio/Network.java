@@ -13,17 +13,15 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.protocol.HTTP;
 
-/**
- * Created by qwe7002 on 16/5/27.
- */
 public class Network
 {
     public static String SendPost(String url, List<NameValuePair> pairList)
     {
         try
         {
-            HttpEntity requestHttpEntity = new UrlEncodedFormEntity(pairList);
+            HttpEntity requestHttpEntity = new UrlEncodedFormEntity(pairList,HTTP.UTF_8);
             HttpPost httpPost = new HttpPost(url);
             httpPost.setEntity(requestHttpEntity);
             HttpClient httpClient = new DefaultHttpClient();

@@ -168,6 +168,7 @@ public class LoginActivity extends AppCompatActivity
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putString("Hostinfo", public_value.HostURl);
                 editor.commit();
+
             } else
             {
                 AlertDialog alertDialog = new AlertDialog.Builder(LoginActivity.this).create();
@@ -278,8 +279,7 @@ public class LoginActivity extends AppCompatActivity
 
     private boolean isPasswordValid(String password)
     {
-        return true;
-        //return password.length() > 4;
+        return password.length() > 4;
     }
 
     private void showProgress()
@@ -321,6 +321,7 @@ public class LoginActivity extends AppCompatActivity
         @Override
         protected void onPostExecute(String result)
         {
+            mpDialog.cancel();
             mAuthTask = null;
             if (result != null)
             {
@@ -340,11 +341,10 @@ public class LoginActivity extends AppCompatActivity
                     {
                         mPasswordView.setError(getString(R.string.error_incorrect_password));
                         mPasswordView.requestFocus();
-                        mpDialog.hide();
                     }
                 } catch (Exception e)
                 {
-                    mpDialog.cancel();
+
                     Log.e("loginerror", e.toString());
                     AlertDialog alertDialog = new AlertDialog.Builder(LoginActivity.this).create();
                     alertDialog.setTitle("服务器错误");
