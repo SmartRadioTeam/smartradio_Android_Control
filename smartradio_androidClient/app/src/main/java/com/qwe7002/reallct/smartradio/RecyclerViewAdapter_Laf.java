@@ -9,6 +9,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -36,7 +37,7 @@ public class RecyclerViewAdapter_Laf extends RecyclerView.Adapter<RecyclerViewAd
     ArrayList Selectlist = null;
     boolean actionMode = false;
 
-    public RecyclerViewAdapter_Laf(List<laf> laftable, Context context)
+    public RecyclerViewAdapter_Laf(List<laf> laftable, Context context, Toolbar toolbar)
     {
         this.laftable = laftable;
         this.context = context;
@@ -219,13 +220,7 @@ public class RecyclerViewAdapter_Laf extends RecyclerView.Adapter<RecyclerViewAd
             {
                 JsonParser parser = new JsonParser();
                 JsonObject object = (JsonObject) parser.parse(params[0]);
-                if (object.get("submitmode").getAsString().equals("muilt"))
-                {
-                    return APIs.ItemsControlMuilt(object.get("mode").getAsString(), object.get("id").getAsString());
-                } else
-                {
-                    return APIs.ItemsControl(object.get("mode").getAsString(), object.get("id").getAsString());
-                }
+                return APIs.ItemsControl(object.get("mode").getAsString(), object.get("id").getAsString(),object.get("submitmode").getAsString().equals("muilt"));
             } catch (Exception e)
             {
                 return null;

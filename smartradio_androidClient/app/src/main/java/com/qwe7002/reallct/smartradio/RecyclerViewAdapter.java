@@ -191,10 +191,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                             @Override
                             public void onClick(DialogInterface dialog, int which)
                             {
-                                if (which != 3)
-                                {
-                                    Snackbar.make(views, "条目已被设为" + views.getText(), Snackbar.LENGTH_SHORT).show();
-                                }
+
                                 String mode = "";
                                 switch (which)
                                 {
@@ -211,12 +208,22 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                                         mode = "normalplay";
                                         break;
                                     case 3:
+                                        public_value.songtable.remove(j);
                                         mode = "delete";
                                         break;
                                 }
-                                Intent intent = new Intent();
-                                LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
                                 new sendcontrol().execute("{'mode':'" + mode + "','id':" + songtable.get(j).getid() + ",'submitmode':'single'}");
+                                if (which != 3)
+                                {
+                                    Snackbar.make(views, "条目已被设为" + views.getText(), Snackbar.LENGTH_SHORT).show();
+                                }else{
+                                    Snackbar.make(views, "条目已被删除", Snackbar.LENGTH_SHORT).show();
+                                }
+                                Intent intent = new Intent();
+                                intent.setAction("refulsh.activity");
+                                LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+
+
                             }
                         }).show();
             }
@@ -376,15 +383,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             {
                 JsonParser parser = new JsonParser();
                 JsonObject object = (JsonObject) parser.parse(params[0]);
-                if (object.get("submitmode").getAsString().equals("muilt"))
-                {
-                    return APIs.ItemsControlMuilt(object.get("mode").getAsString(), object.get("id").getAsString());
-                } else
-                {
-                    return APIs.ItemsControl(object.get("mode").getAsString(), object.get("id").getAsString());
-                }
+                return APIs.ItemsControl(object.get("mode").getAsString(), object.get("id").getAsString(),object.get("submitmode").getAsString().equals("muilt"));
             } catch (Exception e)
             {
+                Log.i("error",e.toString());
                 return null;
             }
         }
@@ -399,8 +401,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 Log.i("result",result);
                 JsonParser parser = new JsonParser();
                 JsonObject object = (JsonObject) parser.parse(result);
-                if (object.get("mod").getAsString().equals("success"))
+                if (object.get("mode").getAsString().equals("success"))
                 {
+
                     return;
                 }
             } else
@@ -487,11 +490,17 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                                             mode = "delete";
                                             break;
                                     }
-                                    Intent intent = new Intent();
-                                    LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+                                    ArrayList idlist=new ArrayList();
+                                    for (Object I:templist)
+                                    {
+                                        idlist.add(songtable.get(Integer.parseInt(I.toString())).getid());
+                                    }
                                     Gson gson = new Gson();
-                                    String muiltItemList = gson.toJson(templist);
-                                    new sendcontrol().execute("{'mode':'" + mode + "','id':" + muiltItemList + ",'submitmode':'muilt'}");
+                                    String muiltItemList = gson.toJson(idlist);
+                                    new sendcontrol().execute("{'mode':'" + mode + "','id':'" + muiltItemList + "','submitmode':'muilt'}");
+                                    Intent intent = new Intent();
+                                    intent.setAction("refulsh.activity");
+                                    LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
 
                                 }
                             })

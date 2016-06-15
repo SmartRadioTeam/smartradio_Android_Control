@@ -43,7 +43,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private RecyclerView recyclerView;
     private List<song> songList;
     private List<laf> lafList;
-    private RecyclerViewAdapter adapter;
     private SwipeRefreshLayout mSwipeRefreshWidget;
     private Toolbar toolbar;
     private Boolean firstlaunch = true;
@@ -121,6 +120,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onRefresh()
             {
+                mSwipeRefreshWidget.setRefreshing(true);
                 new getlist().execute();
             }
         });
@@ -152,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 row++;
 
             }
-            adapter = new RecyclerViewAdapter(songList, MainActivity.this, toolbar);
+            RecyclerViewAdapter adapter = new RecyclerViewAdapter(songList, MainActivity.this, toolbar);
             recyclerView.setAdapter(adapter);
         } catch (Exception e)
         {
@@ -226,9 +226,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 JsonObject item = JE.getAsJsonObject();
                 lafList.add(new laf(item.get("id").getAsInt(), item.get("title").getAsString(), item.get("message").getAsString()));
             }
+            RecyclerViewAdapter_Laf adapter = new RecyclerViewAdapter_Laf(lafList, MainActivity.this, toolbar);
+            recyclerView.setAdapter(adapter);
         } catch (Exception e)
         {
-
+            Log.i("error",e.toString());
         }
     }
 
@@ -248,9 +250,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 mpDialog.setIndeterminate(false);
                 mpDialog.setCancelable(false);
                 mpDialog.show();
-            } else
-            {
-                mSwipeRefreshWidget.setRefreshing(true);
             }
         }
 
@@ -276,11 +275,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (result != null)
             {
                 Log.i("result",result);
-                JsonParser parser = new JsonParser();
-                JsonObject object = (JsonObject) parser.parse(result);
-                public_value.songtable = object.getAsJsonArray("songtable");
-                public_value.songinfo = object.getAsJsonObject("songinfo");
-                public_value.laftable = object.getAsJsonArray("lostandfound");
+                try
+                {
+                    JsonParser parser = new JsonParser();
+                    JsonObject object = (JsonObject) parser.parse(result);
+                    public_value.songtable = object.getAsJsonArray("songtable");
+                    public_value.songinfo = object.getAsJsonObject("songinfo");
+                    public_value.laftable = object.getAsJsonArray("lostandfound");
+                }catch(Exception e){
+                    Log.i("error",e.toString());
+                }
                 switch (public_value.navistate)
                 {
                     case 0:

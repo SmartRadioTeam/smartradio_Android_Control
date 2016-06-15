@@ -33,11 +33,14 @@ public class song implements Serializable
         this.playtime = "播放时间：" + playtime;
     }
 
+    public void settaskstate(int taskstate)
+    {
+        this.taskstate=taskstate;
+    }
     public int gettaskstate()
     {
         return taskstate;
     }
-
     public String getmessage()
     {
         return message;
