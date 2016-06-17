@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
@@ -78,14 +80,16 @@ public class RecyclerViewAdapter_Laf extends RecyclerView.Adapter<RecyclerViewAd
     public void onBindViewHolder(RecyclerViewAdapter_Laf.laftabletViewHolder personViewHolder, int i)
     {
         final int j = i;
-        personViewHolder.card_user.setText(laftable.get(i).getTitle());
-        personViewHolder.card_message.setText(laftable.get(i).getmessage());
+        personViewHolder.card_user.setText("丢失人："+laftable.get(i).getTitle());
+        personViewHolder.card_message.setText("「"+laftable.get(i).getmessage()+"」");
+        personViewHolder.card_tel.setText("电话："+laftable.get(i).gettel());
         personViewHolder.checkbutton.setOnClickListener(new View.OnClickListener()
         {
 
             @Override
             public void onClick(View v)
             {
+                final View views=(View)v;
                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
                 alertDialog
                         .setTitle("您是否要执行此操作？")
@@ -100,6 +104,7 @@ public class RecyclerViewAdapter_Laf extends RecyclerView.Adapter<RecyclerViewAd
                                         Intent intent = new Intent();
                                         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
                                         new sendcontrol().execute("{'mode':'" + mode + "','id':" + laftable.get(j).getid() + ",'submitmode':'single'}");
+                                        Snackbar.make(views, "条目已被删除", Snackbar.LENGTH_SHORT).show();
                                     }
                                 })
                         .setNegativeButton("取消",
@@ -138,73 +143,6 @@ public class RecyclerViewAdapter_Laf extends RecyclerView.Adapter<RecyclerViewAd
         return laftable.size();
     }
 
-    private ActionMode.Callback mCallback = new ActionMode.Callback()
-    {
-
-        @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu)
-        {
-            return false;
-        }
-
-        @Override
-        public void onDestroyActionMode(ActionMode mode)
-        {
-            int count = 0;
-            for (Object i : Selectview)
-            {
-
-                count++;
-            }
-            Selectview = null;
-            Selectlist = null;
-            actionMode = false;
-
-        }
-
-        @Override
-        public boolean onCreateActionMode(ActionMode mode, Menu menu)
-        {
-            MenuInflater inflater = mode.getMenuInflater();
-            inflater.inflate(R.menu.laf_muiltselect, menu);
-            return true;
-        }
-
-        @Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item)
-        {
-            final ArrayList templist = Selectlist;
-            AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
-            alertDialog
-                    .setTitle("您是否要执行此操作？")
-                    .setMessage("选中项将根据您的设定被删除。")
-                    .setPositiveButton("确定",
-                            new DialogInterface.OnClickListener()
-                            {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which)
-                                {
-                                    String mode = "lostandfound";
-                                    Intent intent = new Intent();
-                                    LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-                                    Gson gson = new Gson();
-                                    String muiltItemList = gson.toJson(templist);
-                                    new sendcontrol().execute("{'mode':'" + mode + "','id':" + muiltItemList + ",'submitmode':'muilt'}");
-                                }
-                            })
-                    .setNegativeButton("取消",
-                            new DialogInterface.OnClickListener()
-                            {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which)
-                                {
-                                }
-                            }).setCancelable(false).create().show();
-            mode.finish();
-            return true;
-        }
-    };
-
     public class sendcontrol extends AsyncTask<String, Integer, String>
     {
         @Override
@@ -236,8 +174,9 @@ public class RecyclerViewAdapter_Laf extends RecyclerView.Adapter<RecyclerViewAd
             {
                 JsonParser parser = new JsonParser();
                 JsonObject object = (JsonObject) parser.parse(result);
-                if (object.get("mod").getAsString().equals("success"))
+                if (object.get("mode").getAsString().equals("success"))
                 {
+
                     return;
                 }
             } else

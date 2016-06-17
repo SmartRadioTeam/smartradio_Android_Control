@@ -7,16 +7,17 @@ import java.io.Serializable;
  */
 public class laf implements Serializable
 {
+    private String tel;
     private int id;
     private String title;
     private String message;
 
-    public laf(int id, String name, String message)
+    public laf(int id, String name, String message,String tel)
     {
         this.id=id;
         this.title = name;
         this.message = message;
-
+        this.tel=tel;
     }
     public int getid()
     {
@@ -31,5 +32,9 @@ public class laf implements Serializable
     public String getTitle()
     {
         return title;
+    }
+    public String gettel()
+    {
+        return tel;
     }
 }

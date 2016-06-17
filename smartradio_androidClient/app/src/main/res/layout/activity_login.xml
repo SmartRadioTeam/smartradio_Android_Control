@@ -35,6 +35,16 @@
 
             </android.support.design.widget.TextInputLayout>
 
+            <Switch
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="自动登陆"
+                android:id="@+id/switch2"
+                android:contextClickable="false"
+                android:checked="true"
+                android:layout_marginLeft="1dp"
+                android:layout_marginRight="1dp"/>
+
 
         </LinearLayout>
      <android.support.design.widget.FloatingActionButton android:id="@+id/fab"

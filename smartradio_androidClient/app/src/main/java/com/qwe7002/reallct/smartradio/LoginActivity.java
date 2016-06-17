@@ -8,20 +8,23 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
+import static android.text.TextUtils.isEmpty;
 
 
 public class LoginActivity extends AppCompatActivity
@@ -32,12 +35,16 @@ public class LoginActivity extends AppCompatActivity
     private EditText mPasswordView;
     ProgressDialog mpDialog;
     SharedPreferences sharedPreferences;
+    SharedPreferences userinfo;
+    private FingerprintManagerCompat manager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        mUsernameView = (TextView) findViewById(R.id.username);
+        mPasswordView = (EditText) findViewById(R.id.password);
         if (!isNetConnected())
         {
             AlertDialog alertDialog = new AlertDialog.Builder(this).create();
@@ -58,39 +65,22 @@ public class LoginActivity extends AppCompatActivity
             try
             {
                 sharedPreferences = getSharedPreferences("Hostinfo", Context.MODE_PRIVATE);
-
+                userinfo = getSharedPreferences("user", Context.MODE_PRIVATE);
             } catch (Exception e)
             {
-
             }
-                public_value.HostURl = sharedPreferences.getString("Hostinfo", null);
-                if (public_value.HostURl == null || public_value.HostURl.equals("http://") || public_value.HostURl.equals(""))
-                {
-                    sethosturl();
-                } else
-                {
-                    new getsettings().execute();
-                }
-
+            mUsernameView.setText(userinfo.getString("username", null));
+            mPasswordView.setText(userinfo.getString("password", null));
+            public_value.HostURl = sharedPreferences.getString("Hostinfo", null);
+            if (public_value.HostURl == null || public_value.HostURl.equals("http://") || public_value.HostURl.equals(""))
+            {
+                sethosturl();
+            } else
+            {
+                new getsettings().execute();
+            }
 
         }
-
-        mUsernameView = (TextView) findViewById(R.id.username);
-        mPasswordView = (EditText) findViewById(R.id.password);
-        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener()
-        {
-            @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent)
-            {
-                if (id == R.id.login || id == EditorInfo.IME_NULL)
-                {
-                    attemptLogin();
-                    return true;
-                }
-                return false;
-            }
-        });
-
         mUsernameView.setOnEditorActionListener(new TextView.OnEditorActionListener()
         {
             @Override
@@ -113,6 +103,9 @@ public class LoginActivity extends AppCompatActivity
                 attemptLogin();
             }
         });
+
+        // 获取一个FingerPrintManagerCompat的实例
+        manager = FingerprintManagerCompat.from(this);
     }
 
     private void sethosturl()
@@ -164,10 +157,28 @@ public class LoginActivity extends AppCompatActivity
             mpDialog.cancel();
             if (s)
             {
-                setTitle(projectname);
+                setTitle(projectname + " - 登陆");
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putString("Hostinfo", public_value.HostURl);
                 editor.commit();
+                if (!isEmpty(mUsernameView.getText()) && !isEmpty(mPasswordView.getText()))
+                {
+                    if (manager.isHardwareDetected() && manager.hasEnrolledFingerprints())
+                    {
+                        mpDialog = new ProgressDialog(LoginActivity.this);
+                        mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                        mpDialog.setTitle("正在尝试验证指纹...");
+                        mpDialog.setMessage("请将您的手指放在指纹识别器上...");
+                        mpDialog.setIndeterminate(false);
+                        mpDialog.setCancelable(false);
+                        mpDialog.show();
+                        manager.authenticate(null, 0, null, new MyCallBack(), null);
+                    } else
+                    {
+                        attemptLogin();
+                    }
+
+                }
 
             } else
             {
@@ -199,6 +210,45 @@ public class LoginActivity extends AppCompatActivity
             mpDialog.setIndeterminate(false);
             mpDialog.setCancelable(false);
             mpDialog.show();
+        }
+    }
+
+    public class MyCallBack extends FingerprintManagerCompat.AuthenticationCallback
+    {
+        private static final String TAG = "MyCallBack";
+
+        // 当出现错误的时候回调此函数，比如多次尝试都失败了的时候，errString是错误信息
+        @Override
+        public void onAuthenticationError(int errMsgId, CharSequence errString)
+        {
+            mpDialog.dismiss();
+            mPasswordView.setText(null);
+            mPasswordView.setError("请输入密码！");
+            mPasswordView.requestFocus();
+            Log.d(TAG, "onAuthenticationError: " + errString);
+        }
+
+        // 当指纹验证失败的时候会回调此函数，失败之后允许多次尝试，失败次数过多会停止响应一段时间然后再停止sensor的工作
+        @Override
+        public void onAuthenticationFailed()
+        {
+            mpDialog.setMessage("验证失败，请重试...");
+            Log.d(TAG, "验证失败");
+        }
+
+        @Override
+        public void onAuthenticationHelp(int helpMsgId, CharSequence helpString)
+        {
+            Log.d(TAG, "onAuthenticationHelp: " + helpString);
+        }
+
+        // 当验证的指纹成功时会回调此函数，然后不再监听指纹sensor
+        @Override
+        public void onAuthenticationSucceeded(FingerprintManagerCompat.AuthenticationResult result)
+        {
+            mpDialog.dismiss();
+            Log.d(TAG, "验证成功");
+            attemptLogin();
         }
     }
 
@@ -254,13 +304,13 @@ public class LoginActivity extends AppCompatActivity
         boolean cancel = false;
         View focusView = null;
 
-        if (!TextUtils.isEmpty(password) && !isPasswordValid(password))
+        if (!isEmpty(password) && !isPasswordValid(password))
         {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
         }
-        if (TextUtils.isEmpty(email))
+        if (isEmpty(email))
         {
             mUsernameView.setError(getString(R.string.error_field_required));
             focusView = mUsernameView;
@@ -334,6 +384,14 @@ public class LoginActivity extends AppCompatActivity
                     {
                         public_value.sessionid = Jobj.get("authkey").getAsString();
                         public_value.username = mEmail;
+                        Switch s1 = (Switch) findViewById(R.id.switch2);
+                        if (s1.isChecked() == true)
+                        {
+                            SharedPreferences.Editor editor = userinfo.edit();
+                            editor.putString("username", mEmail);
+                            editor.putString("password", mPassword);
+                            editor.commit();
+                        }
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         startActivity(intent);
                         finish();

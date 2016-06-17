@@ -118,7 +118,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 return true;
             }
         });
-        //notifyItemInserted(i);
         personViewHolder.cardView.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -216,7 +215,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                                 if (which != 3)
                                 {
                                     Snackbar.make(views, "条目已被设为" + views.getText(), Snackbar.LENGTH_SHORT).show();
-                                }else{
+                                } else
+                                {
                                     Snackbar.make(views, "条目已被删除", Snackbar.LENGTH_SHORT).show();
                                 }
                                 Intent intent = new Intent();
@@ -383,10 +383,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             {
                 JsonParser parser = new JsonParser();
                 JsonObject object = (JsonObject) parser.parse(params[0]);
-                return APIs.ItemsControl(object.get("mode").getAsString(), object.get("id").getAsString(),object.get("submitmode").getAsString().equals("muilt"));
+                return APIs.ItemsControl(object.get("mode").getAsString(), object.get("id").getAsString(), object.get("submitmode").getAsString().equals("muilt"));
             } catch (Exception e)
             {
-                Log.i("error",e.toString());
+                Log.i("error", e.toString());
                 return null;
             }
         }
@@ -398,7 +398,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             showProgress(false);
             if (result != null)
             {
-                Log.i("result",result);
+                Log.i("result", result);
                 JsonParser parser = new JsonParser();
                 JsonObject object = (JsonObject) parser.parse(result);
                 if (object.get("mode").getAsString().equals("success"))
@@ -490,8 +490,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                                             mode = "delete";
                                             break;
                                     }
-                                    ArrayList idlist=new ArrayList();
-                                    for (Object I:templist)
+                                    ArrayList idlist = new ArrayList();
+                                    for (Object I : templist)
                                     {
                                         idlist.add(songtable.get(Integer.parseInt(I.toString())).getid());
                                     }

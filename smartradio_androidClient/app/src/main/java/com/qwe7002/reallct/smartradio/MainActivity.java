@@ -7,8 +7,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -101,6 +103,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         View header = navigationView.inflateHeaderView(R.layout.nav_header_main);
         TextView tv = (TextView) header.findViewById(R.id.navusername);
         tv.setText(public_value.username);
+        setTitle(public_value.settings.get("projectname").getAsString()+"管理中心");
         //设定正文
         mSwipeRefreshWidget = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_widget);
         recyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
@@ -110,11 +113,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         mSwipeRefreshWidget.setColorSchemeResources(R.color.colorPrimary);
         new getlist().execute();
-        if (public_value.settings.get("permission").equals("0"))
-        {
-            View v = findViewById(R.id.main_layout);
-            Snackbar.make(v, "当前策略禁止点歌", Snackbar.LENGTH_SHORT).show();
-        }
         mSwipeRefreshWidget.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener()
         {
             @Override
@@ -144,12 +142,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     if (a1.equals(item.get("time").getAsString()))
                     {
                         songList.add(new song(row, item.get("id").getAsInt(), songinfo.get("songtitle").getAsString(), item.get("message").getAsString(), item.get("user").getAsString(), item.get("to").getAsString(), time, item.get("songid").getAsString(), Integer.parseInt(item.get("info").getAsString())));
+                        row++;
                     }
                 } else
                 {
                     songList.add(new song(row, item.get("id").getAsInt(), songinfo.get("songtitle").getAsString(), item.get("message").getAsString(), item.get("user").getAsString(), item.get("to").getAsString(), time, item.get("songid").getAsString(), Integer.parseInt(item.get("info").getAsString())));
+                    row++;
                 }
-                row++;
+
+            }
+            if (row == 0)
+            {
+                if (public_value.settings.get("permission").getAsString().equals("0"))
+                {
+                    Snackbar.make(mSwipeRefreshWidget, "当前策略禁止点歌！", Snackbar.LENGTH_SHORT).show();
+                } else
+                {
+                    Snackbar.make(mSwipeRefreshWidget, "当前选项暂无项目！", Snackbar.LENGTH_SHORT).show();
+                }
 
             }
             RecyclerViewAdapter adapter = new RecyclerViewAdapter(songList, MainActivity.this, toolbar);
@@ -173,25 +183,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        if (item.getItemId() == R.id.action_settings)
-        {
-            Intent intent = new Intent(this, settingActivity.class);
-            startActivity(intent);
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item)
@@ -208,7 +199,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 setSongList(false);
                 break;
             case R.id.nav_laf:
+                public_value.navistate = 2;
                 setlostandfound();
+                break;
+            case R.id.action_settings:
+                Intent intent = new Intent(this, settingActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.logout:
+                SharedPreferences.Editor editors = getSharedPreferences("user", Context.MODE_PRIVATE).edit();
+                editors.clear();
+                editors.apply();
+                Intent intents = new Intent(this, LoginActivity.class);
+                startActivity(intents);
+                finish();
                 break;
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -218,20 +222,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void setlostandfound()
     {
-        try
+        if (public_value.laftable.size() == 0)
         {
-            lafList = new ArrayList<laf>();
-            for (JsonElement JE : public_value.laftable)
-            {
-                JsonObject item = JE.getAsJsonObject();
-                lafList.add(new laf(item.get("id").getAsInt(), item.get("title").getAsString(), item.get("message").getAsString()));
-            }
-            RecyclerViewAdapter_Laf adapter = new RecyclerViewAdapter_Laf(lafList, MainActivity.this, toolbar);
-            recyclerView.setAdapter(adapter);
-        } catch (Exception e)
-        {
-            Log.i("error",e.toString());
+            Snackbar.make(mSwipeRefreshWidget, "当前选项暂无项目！", Snackbar.LENGTH_SHORT).show();
         }
+        lafList = new ArrayList<laf>();
+        for (JsonElement JE : public_value.laftable)
+        {
+            JsonObject item = JE.getAsJsonObject();
+            lafList.add(new laf(item.get("id").getAsInt(), item.get("user").getAsString(), item.get("message").getAsString(), item.get("tel").getAsString()));
+        }
+        RecyclerViewAdapter_Laf adapter = new RecyclerViewAdapter_Laf(lafList, MainActivity.this, toolbar);
+        recyclerView.setAdapter(adapter);
     }
 
     public class getlist extends AsyncTask<Void, Integer, String>
@@ -274,7 +276,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             mpDialog.cancel();
             if (result != null)
             {
-                Log.i("result",result);
+                Log.i("result", result);
                 try
                 {
                     JsonParser parser = new JsonParser();
@@ -282,8 +284,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     public_value.songtable = object.getAsJsonArray("songtable");
                     public_value.songinfo = object.getAsJsonObject("songinfo");
                     public_value.laftable = object.getAsJsonArray("lostandfound");
-                }catch(Exception e){
-                    Log.i("error",e.toString());
+                } catch (Exception e)
+                {
+                    Log.i("error", e.toString());
                 }
                 switch (public_value.navistate)
                 {
