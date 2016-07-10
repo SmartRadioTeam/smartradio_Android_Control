@@ -14,8 +14,7 @@ import android.widget.Switch;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-public class settingActivity extends AppCompatActivity
-{
+public class settingActivity extends AppCompatActivity {
     Switch s;
     EditText edit;
     Boolean switchchangestate = false;
@@ -23,8 +22,7 @@ public class settingActivity extends AppCompatActivity
     ProgressDialog mpDialog;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -32,29 +30,23 @@ public class settingActivity extends AppCompatActivity
         toolbar.setNavigationOnClickListener(listener);
         toolbar.setNavigationIcon(R.drawable.ic_check_white_36dp);
         s = (Switch) findViewById(R.id.switch1);
-        try
-        {
-            if (public_value.settings.get("permission").getAsString().equals("0"))
-            {
+        try {
+            if (public_value.settings.get("permission").getAsString().equals("0")) {
                 s.setChecked(false);
-            } else
-            {
+            } else {
                 s.setChecked(true);
             }
-            edit = (EditText) findViewById(R.id.editText);
+            edit = (EditText) findViewById(R.id.Setting_notify);
             edit.setText(public_value.settings.get("notice").getAsString());
-        } catch (Exception e) {}
-        s.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
-        {
+        } catch (Exception e) {
+        }
+        s.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
-            {
-                if (isChecked)
-                {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
                     switchstate = true;
-                } else
-                {
+                } else {
                     switchstate = false;
                 }
                 switchchangestate = true;
@@ -62,31 +54,26 @@ public class settingActivity extends AppCompatActivity
         });
     }
 
-    private View.OnClickListener listener = new View.OnClickListener()
-    {
+    private View.OnClickListener listener = new View.OnClickListener() {
         @Override
-        public void onClick(View v)
-        {
+        public void onClick(View v) {
             new startsetsetting().execute();
         }
     };
 
     @Override
-    public void onBackPressed()
-    {
+    public void onBackPressed() {
         new startsetsetting().execute();
         return;
     }
 
-    private class startsetsetting extends AsyncTask<Void, Void, Boolean>
-    {
+    private class startsetsetting extends AsyncTask<Void, Void, Boolean> {
         String value;
         int mode = 0;
         String permission;
 
         @Override
-        protected void onPreExecute()
-        {
+        protected void onPreExecute() {
             mpDialog = new ProgressDialog(settingActivity.this);
             mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
             mpDialog.setTitle("正在连接服务器...");
@@ -94,61 +81,50 @@ public class settingActivity extends AppCompatActivity
             mpDialog.setIndeterminate(false);
             mpDialog.setCancelable(false);
             mpDialog.show();
-            if (!edit.getText().equals(public_value.settings.get("notice").getAsString()))
-            {
+            if (!edit.getText().equals(public_value.settings.get("notice").getAsString())) {
                 value = edit.getText().toString();
                 mode = 1;
             }
-            if (switchchangestate)
-            {
-                if (switchstate)
-                {
+            if (switchchangestate) {
+                if (switchstate) {
                     permission = "1";
-                } else
-                {
+                } else {
                     permission = "0";
                 }
-                if (mode == 1)
-                {
+                if (mode == 1) {
                     mode = 3;
-                } else
-                {
+                } else {
                     mode = 2;
                 }
             }
         }
 
         @Override
-        protected Boolean doInBackground(Void... params)
-        {
-            try
-            {
-                switch (mode)
-                {
+        protected Boolean doInBackground(Void... params) {
+            try {
+                switch (mode) {
                     case 1:
-                        Log.i("setnotece",APIs.setsetting("notice", value));
+                        Log.i("setnotece", APIs.setsetting("notice", value));
                         break;
                     case 2:
-                        Log.i("setpermission",APIs.setsetting("permission", permission));
+                        Log.i("setpermission", APIs.setsetting("permission", permission));
                         break;
                     case 3:
-                        Log.i("setnotece",APIs.setsetting("notice", value));
-                        Log.i("setpermisson",APIs.setsetting("permission", permission));
+                        Log.i("setnotece", APIs.setsetting("notice", value));
+                        Log.i("setpermisson", APIs.setsetting("permission", permission));
                         break;
                 }
                 JsonParser parser = new JsonParser();
                 JsonObject jsonobj = (JsonObject) parser.parse(APIs.getsetting());
                 public_value.settings = jsonobj.get("settings").getAsJsonObject();
                 return true;
-            } catch (Exception e)
-            {
+            } catch (Exception e) {
                 return false;
             }
         }
 
         @Override
-        protected void onPostExecute(Boolean s)
-        {
+        protected void onPostExecute(Boolean s) {
             mpDialog.cancel();
             finish();
         }

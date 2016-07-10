@@ -15,63 +15,51 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HTTP;
 
-public class Network
-{
-    public static String SendPost(String url, List<NameValuePair> pairList)
-    {
-        try
-        {
-            HttpEntity requestHttpEntity = new UrlEncodedFormEntity(pairList,HTTP.UTF_8);
+public class Network {
+    public static String SendPost(String url, List<NameValuePair> pairList) {
+        try {
+            HttpEntity requestHttpEntity = new UrlEncodedFormEntity(pairList, HTTP.UTF_8);
             HttpPost httpPost = new HttpPost(url);
             httpPost.setEntity(requestHttpEntity);
             HttpClient httpClient = new DefaultHttpClient();
             HttpResponse response = httpClient.execute(httpPost);
             return showResponseResult(response);
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    public static String SendGet(String url)
-    {
+    public static String SendGet(String url) {
         HttpGet httpGet = new HttpGet(url);
         HttpClient httpClient = new DefaultHttpClient();
-        try
-        {
+        try {
             HttpResponse response = httpClient.execute(httpGet);
             return showResponseResult(response);
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    private static String showResponseResult(HttpResponse response)
-    {
-        if (null == response)
-        {
+    private static String showResponseResult(HttpResponse response) {
+        if (null == response) {
             return null;
         }
 
         HttpEntity httpEntity = response.getEntity();
-        try
-        {
+        try {
             InputStream inputStream = httpEntity.getContent();
             BufferedReader reader = new BufferedReader(new InputStreamReader(
                     inputStream));
             String result = "";
             String line = "";
-            while (null != (line = reader.readLine()))
-            {
+            while (null != (line = reader.readLine())) {
                 result += line;
 
             }
             return result;
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;

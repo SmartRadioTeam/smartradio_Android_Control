@@ -12,13 +12,18 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.qwe7002.reallct.smartradio.settingActivity"
     tools:showIn="@layout/activity_setting">
-
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="允许新点歌："
+        android:id="@+id/text1"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"/>
     <Switch
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="接收新的点歌"
         android:id="@+id/switch1"
-        android:layout_alignParentTop="true"
+        android:layout_below="@+id/text1"
         android:layout_alignParentEnd="true"
         android:layout_alignParentStart="true"/>
 
@@ -35,9 +40,10 @@
         android:layout_height="wrap_content"
         android:inputType="textMultiLine"
         android:ems="10"
-        android:id="@+id/editText"
+        android:id="@+id/Setting_notify"
         android:layout_below="@+id/textView"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"/>
+
 
 </RelativeLayout>

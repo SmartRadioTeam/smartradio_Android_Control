@@ -27,8 +27,7 @@ import com.google.gson.JsonParser;
 import static android.text.TextUtils.isEmpty;
 
 
-public class LoginActivity extends AppCompatActivity
-{
+public class LoginActivity extends AppCompatActivity {
 
     private UserLoginTask mAuthTask = null;
     private TextView mUsernameView;
@@ -39,55 +38,43 @@ public class LoginActivity extends AppCompatActivity
     private FingerprintManagerCompat manager;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         mUsernameView = (TextView) findViewById(R.id.username);
         mPasswordView = (EditText) findViewById(R.id.password);
-        if (!isNetConnected())
-        {
+        if (!isNetConnected()) {
             AlertDialog alertDialog = new AlertDialog.Builder(this).create();
             alertDialog.setTitle("请链接网络");
             alertDialog.setMessage("没有检测到可用网络连接，请检查您的网络设置！");
             alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "确定",
-                    new DialogInterface.OnClickListener()
-                    {
-                        public void onClick(DialogInterface dialog, int which)
-                        {
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
                             dialog.dismiss();
                             finish();
                         }
                     });
             alertDialog.show();
-        } else
-        {
-            try
-            {
+        } else {
+            try {
                 sharedPreferences = getSharedPreferences("Hostinfo", Context.MODE_PRIVATE);
                 userinfo = getSharedPreferences("user", Context.MODE_PRIVATE);
-            } catch (Exception e)
-            {
+            } catch (Exception e) {
             }
             mUsernameView.setText(userinfo.getString("username", null));
             mPasswordView.setText(userinfo.getString("password", null));
             public_value.HostURl = sharedPreferences.getString("Hostinfo", null);
-            if (public_value.HostURl == null || public_value.HostURl.equals("http://") || public_value.HostURl.equals(""))
-            {
-                sethosturl();
-            } else
-            {
+            if (public_value.HostURl == null || public_value.HostURl.equals("http://") || public_value.HostURl.equals("")) {
+                sethosturl("http://");
+            } else {
                 new getsettings().execute();
             }
 
         }
-        mUsernameView.setOnEditorActionListener(new TextView.OnEditorActionListener()
-        {
+        mUsernameView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent)
-            {
-                if (id == EditorInfo.IME_ACTION_GO)
-                {
+            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
+                if (id == EditorInfo.IME_ACTION_GO) {
                     mPasswordView.requestFocus();
                     return true;
                 }
@@ -95,11 +82,9 @@ public class LoginActivity extends AppCompatActivity
             }
         });
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener()
-        {
+        fab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view)
-            {
+            public void onClick(View view) {
                 attemptLogin();
             }
         });
@@ -108,10 +93,9 @@ public class LoginActivity extends AppCompatActivity
         manager = FingerprintManagerCompat.from(this);
     }
 
-    private void sethosturl()
-    {
+    private void sethosturl(String url) {
         final EditText text = new EditText(this);
-        text.setText("http://");
+        text.setText(url);
         text.setHint("服务器地址");
         text.setMaxLines(1);
         AlertDialog alertDialog = new AlertDialog.Builder(this).create();
@@ -119,10 +103,8 @@ public class LoginActivity extends AppCompatActivity
         alertDialog.setView(text);
         alertDialog.setCancelable(false);
         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "确定",
-                new DialogInterface.OnClickListener()
-                {
-                    public void onClick(DialogInterface dialog, int which)
-                    {
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
                         public_value.HostURl = text.getText().toString();
                         dialog.dismiss();
                         new getsettings().execute();
@@ -131,40 +113,32 @@ public class LoginActivity extends AppCompatActivity
         alertDialog.show();
     }
 
-    private class getsettings extends AsyncTask<Void, Void, Boolean>
-    {
+    private class getsettings extends AsyncTask<Void, Void, Boolean> {
         String projectname;
 
         @Override
-        protected Boolean doInBackground(Void... params)
-        {
-            try
-            {
+        protected Boolean doInBackground(Void... params) {
+            try {
                 JsonParser parser = new JsonParser();
                 JsonObject jsonobj = (JsonObject) parser.parse(APIs.getsetting());
                 public_value.settings = jsonobj.get("settings").getAsJsonObject();
                 projectname = public_value.settings.get("projectname").getAsString();
                 return true;
-            } catch (Exception e)
-            {
+            } catch (Exception e) {
                 return false;
             }
         }
 
         @Override
-        protected void onPostExecute(Boolean s)
-        {
+        protected void onPostExecute(Boolean s) {
             mpDialog.cancel();
-            if (s)
-            {
+            if (s) {
                 setTitle(projectname + " - 登陆");
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putString("Hostinfo", public_value.HostURl);
                 editor.commit();
-                if (!isEmpty(mUsernameView.getText()) && !isEmpty(mPasswordView.getText()))
-                {
-                    if (manager.isHardwareDetected() && manager.hasEnrolledFingerprints())
-                    {
+                if (!isEmpty(mUsernameView.getText()) && !isEmpty(mPasswordView.getText())) {
+                    if (manager.isHardwareDetected() && manager.hasEnrolledFingerprints()) {
                         mpDialog = new ProgressDialog(LoginActivity.this);
                         mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                         mpDialog.setTitle("正在尝试验证指纹...");
@@ -173,24 +147,20 @@ public class LoginActivity extends AppCompatActivity
                         mpDialog.setCancelable(false);
                         mpDialog.show();
                         manager.authenticate(null, 0, null, new MyCallBack(), null);
-                    } else
-                    {
+                    } else {
                         attemptLogin();
                     }
 
                 }
 
-            } else
-            {
+            } else {
                 AlertDialog alertDialog = new AlertDialog.Builder(LoginActivity.this).create();
                 alertDialog.setTitle("输入的地址错误");
                 alertDialog.setMessage("您输入的服务器地址无法连接，请重新输入!");
                 alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "确定",
-                        new DialogInterface.OnClickListener()
-                        {
-                            public void onClick(DialogInterface dialog, int which)
-                            {
-                                sethosturl();
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                sethosturl(public_value.HostURl);
                             }
                         });
                 alertDialog.show();
@@ -200,8 +170,7 @@ public class LoginActivity extends AppCompatActivity
         }
 
         @Override
-        protected void onPreExecute()
-        {
+        protected void onPreExecute() {
             super.onPreExecute();
             mpDialog = new ProgressDialog(LoginActivity.this);
             mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -213,14 +182,12 @@ public class LoginActivity extends AppCompatActivity
         }
     }
 
-    public class MyCallBack extends FingerprintManagerCompat.AuthenticationCallback
-    {
+    public class MyCallBack extends FingerprintManagerCompat.AuthenticationCallback {
         private static final String TAG = "MyCallBack";
 
         // 当出现错误的时候回调此函数，比如多次尝试都失败了的时候，errString是错误信息
         @Override
-        public void onAuthenticationError(int errMsgId, CharSequence errString)
-        {
+        public void onAuthenticationError(int errMsgId, CharSequence errString) {
             mpDialog.dismiss();
             mPasswordView.setText(null);
             mPasswordView.setError("请输入密码！");
@@ -230,40 +197,32 @@ public class LoginActivity extends AppCompatActivity
 
         // 当指纹验证失败的时候会回调此函数，失败之后允许多次尝试，失败次数过多会停止响应一段时间然后再停止sensor的工作
         @Override
-        public void onAuthenticationFailed()
-        {
+        public void onAuthenticationFailed() {
             mpDialog.setMessage("验证失败，请重试...");
             Log.d(TAG, "验证失败");
         }
 
         @Override
-        public void onAuthenticationHelp(int helpMsgId, CharSequence helpString)
-        {
+        public void onAuthenticationHelp(int helpMsgId, CharSequence helpString) {
             Log.d(TAG, "onAuthenticationHelp: " + helpString);
         }
 
         // 当验证的指纹成功时会回调此函数，然后不再监听指纹sensor
         @Override
-        public void onAuthenticationSucceeded(FingerprintManagerCompat.AuthenticationResult result)
-        {
+        public void onAuthenticationSucceeded(FingerprintManagerCompat.AuthenticationResult result) {
             mpDialog.dismiss();
             Log.d(TAG, "验证成功");
             attemptLogin();
         }
     }
 
-    private boolean isNetConnected()
-    {
+    private boolean isNetConnected() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (cm != null)
-        {
+        if (cm != null) {
             NetworkInfo[] infos = cm.getAllNetworkInfo();
-            if (infos != null)
-            {
-                for (NetworkInfo ni : infos)
-                {
-                    if (ni.isConnected())
-                    {
+            if (infos != null) {
+                for (NetworkInfo ni : infos) {
+                    if (ni.isConnected()) {
                         return true;
                     }
                 }
@@ -272,25 +231,20 @@ public class LoginActivity extends AppCompatActivity
         return false;
     }
 
-    private void attemptLogin()
-    {
-        if (!isNetConnected() || public_value.settings == null)
-        {
+    private void attemptLogin() {
+        if (!isNetConnected() || public_value.settings == null) {
             AlertDialog alertDialog = new AlertDialog.Builder(this).create();
             alertDialog.setTitle("请链接网络");
             alertDialog.setMessage("没有检测到可用网络连接，请检查您的网络设置！");
             alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "确定",
-                    new DialogInterface.OnClickListener()
-                    {
-                        public void onClick(DialogInterface dialog, int which)
-                        {
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
                             dialog.dismiss();
                         }
                     });
             alertDialog.show();
         }
-        if (mAuthTask != null)
-        {
+        if (mAuthTask != null) {
             return;
         }
 
@@ -304,36 +258,30 @@ public class LoginActivity extends AppCompatActivity
         boolean cancel = false;
         View focusView = null;
 
-        if (!isEmpty(password) && !isPasswordValid(password))
-        {
+        if (!isEmpty(password) && !isPasswordValid(password)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
         }
-        if (isEmpty(email))
-        {
+        if (isEmpty(email)) {
             mUsernameView.setError(getString(R.string.error_field_required));
             focusView = mUsernameView;
             cancel = true;
         }
-        if (cancel)
-        {
+        if (cancel) {
             focusView.requestFocus();
-        } else
-        {
+        } else {
             showProgress();
             mAuthTask = new UserLoginTask(email, password);
             mAuthTask.execute((Void) null);
         }
     }
 
-    private boolean isPasswordValid(String password)
-    {
+    private boolean isPasswordValid(String password) {
         return password.length() > 4;
     }
 
-    private void showProgress()
-    {
+    private void showProgress() {
         mpDialog = new ProgressDialog(this);
         mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         mpDialog.setTitle("正在连接服务器...");
@@ -343,50 +291,40 @@ public class LoginActivity extends AppCompatActivity
         mpDialog.show();
     }
 
-    public class UserLoginTask extends AsyncTask<Void, Void, String>
-    {
+    public class UserLoginTask extends AsyncTask<Void, Void, String> {
 
         private final String mEmail;
         private final String mPassword;
 
-        UserLoginTask(String email, String password)
-        {
+        UserLoginTask(String email, String password) {
             mEmail = email;
             mPassword = password;
         }
 
         @Override
-        protected String doInBackground(Void... params)
-        {
-            try
-            {
+        protected String doInBackground(Void... params) {
+            try {
                 String result = APIs.Login(mEmail, mPassword);
                 return result;
-            } catch (Exception e)
-            {
+            } catch (Exception e) {
                 return null;
             }
         }
 
         @Override
-        protected void onPostExecute(String result)
-        {
+        protected void onPostExecute(String result) {
             mpDialog.cancel();
             mAuthTask = null;
-            if (result != null)
-            {
-                try
-                {
+            if (result != null) {
+                try {
                     JsonParser parser = new JsonParser();
                     JsonObject Jobj = (JsonObject) parser.parse(result);
                     Log.i("result", result);
-                    if (Jobj.get("mode").getAsString().equals("success"))
-                    {
+                    if (Jobj.get("mode").getAsString().equals("success")) {
                         public_value.sessionid = Jobj.get("authkey").getAsString();
                         public_value.username = mEmail;
                         Switch s1 = (Switch) findViewById(R.id.switch2);
-                        if (s1.isChecked() == true)
-                        {
+                        if (s1.isChecked() == true) {
                             SharedPreferences.Editor editor = userinfo.edit();
                             editor.putString("username", mEmail);
                             editor.putString("password", mPassword);
@@ -395,23 +333,19 @@ public class LoginActivity extends AppCompatActivity
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         startActivity(intent);
                         finish();
-                    } else
-                    {
+                    } else {
                         mPasswordView.setError(getString(R.string.error_incorrect_password));
                         mPasswordView.requestFocus();
                     }
-                } catch (Exception e)
-                {
+                } catch (Exception e) {
 
                     Log.e("loginerror", e.toString());
                     AlertDialog alertDialog = new AlertDialog.Builder(LoginActivity.this).create();
                     alertDialog.setTitle("服务器错误");
                     alertDialog.setMessage("服务器异常!请检查连接!");
                     alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "确定",
-                            new DialogInterface.OnClickListener()
-                            {
-                                public void onClick(DialogInterface dialog, int which)
-                                {
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
                                 }
                             });
                     alertDialog.show();
@@ -420,8 +354,7 @@ public class LoginActivity extends AppCompatActivity
         }
 
         @Override
-        protected void onCancelled()
-        {
+        protected void onCancelled() {
             mAuthTask = null;
         }
 

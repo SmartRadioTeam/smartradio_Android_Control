@@ -5,8 +5,7 @@ import java.io.Serializable;
 /**
  * Created by 江华 on 2016/5/28.
  */
-public class song implements Serializable
-{
+public class song implements Serializable {
     private int row;
     private int id;
     private String title;
@@ -20,8 +19,7 @@ public class song implements Serializable
     /**
      * Constructs a new instance of {@code Object}.
      */
-    public song(int row, int id, String title, String message, String user, String to, String playtime, String songid, int taskstate)
-    {
+    public song(int row, int id, String title, String message, String user, String to, String playtime, String songid, int taskstate) {
         this.row = row;
         this.id = id;
         this.title = title;
@@ -33,45 +31,43 @@ public class song implements Serializable
         this.playtime = "播放时间：" + playtime;
     }
 
-    public void settaskstate(int taskstate)
-    {
-        this.taskstate=taskstate;
+    public void settaskstate(int taskstate) {
+        this.taskstate = taskstate;
     }
-    public int gettaskstate()
-    {
+
+    public int gettaskstate() {
         return taskstate;
     }
-    public String getmessage()
-    {
+
+    public String getmessage() {
         return message;
     }
 
-    public String getUser()
-    {
+    public String getUser() {
         return user;
     }
 
-    public String getTo()
-    {
+    public String getTo() {
         return to;
     }
 
-    public String getPlaytime()
-    {
+    public String getPlaytime() {
         return playtime;
     }
 
-    public String getTitle()
-    {
+    public String getTitle() {
         return title;
     }
 
-    public String getsongid()
-    {
+    public String getsongid() {
         return songid;
     }
 
-    public int getrow() {return row;}
+    public int getrow() {
+        return row;
+    }
 
-    public int getid() {return id;}
+    public int getid() {
+        return id;
+    }
 }
