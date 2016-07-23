@@ -44,11 +44,7 @@ public class settingActivity extends AppCompatActivity {
 
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    switchstate = true;
-                } else {
-                    switchstate = false;
-                }
+                switchstate = isChecked;
                 switchchangestate = true;
             }
         });

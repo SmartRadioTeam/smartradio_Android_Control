@@ -71,7 +71,7 @@ public class RecyclerViewAdapter_Laf extends RecyclerView.Adapter<RecyclerViewAd
 
             @Override
             public void onClick(View v) {
-                final View views = (View) v;
+                final View views = v;
                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
                 alertDialog
                         .setTitle("您是否要执行此操作？")

@@ -301,11 +301,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             packageInfo = null;
             e.printStackTrace();
         }
-        if (packageInfo == null) {
-            return false;
-        } else {
-            return true;
-        }
+        return packageInfo != null;
     }
 
     @Override
