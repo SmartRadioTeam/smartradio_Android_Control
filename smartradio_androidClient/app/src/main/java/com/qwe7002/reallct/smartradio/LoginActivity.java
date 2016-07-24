@@ -59,7 +59,7 @@ public class LoginActivity extends AppCompatActivity {
             try {
                 sharedPreferences = getSharedPreferences("Hostinfo", Context.MODE_PRIVATE);
                 userinfo = getSharedPreferences("user", Context.MODE_PRIVATE);
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
             mUsernameView.setText(userinfo.getString("username", null));
             mPasswordView.setText(userinfo.getString("password", null));
@@ -82,6 +82,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        assert fab != null;
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -136,7 +137,7 @@ public class LoginActivity extends AppCompatActivity {
                 setTitle(projectname + " - 登陆");
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putString("Hostinfo", public_value.HostURl);
-                editor.commit();
+                editor.apply();
                 if (!isEmpty(mUsernameView.getText()) && !isEmpty(mPasswordView.getText())) {
                     if (manager.isHardwareDetected() && manager.hasEnrolledFingerprints()) {
                         mpDialog = new ProgressDialog(LoginActivity.this);
@@ -304,8 +305,7 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(Void... params) {
             try {
-                String result = APIs.Login(mEmail, mPassword);
-                return result;
+                return APIs.Login(mEmail, mPassword);
             } catch (Exception e) {
                 return null;
             }
@@ -324,11 +324,12 @@ public class LoginActivity extends AppCompatActivity {
                         public_value.sessionid = Jobj.get("authkey").getAsString();
                         public_value.username = mEmail;
                         Switch s1 = (Switch) findViewById(R.id.switch2);
-                        if (s1.isChecked() == true) {
+                        assert s1 != null;
+                        if (s1.isChecked()) {
                             SharedPreferences.Editor editor = userinfo.edit();
                             editor.putString("username", mEmail);
                             editor.putString("password", mPassword);
-                            editor.commit();
+                            editor.apply();
                         }
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         startActivity(intent);
