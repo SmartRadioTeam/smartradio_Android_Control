@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -28,6 +29,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -37,8 +41,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener
-{
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private refulshReceiver receiver = new refulshReceiver();
     private RecyclerView recyclerView;
     private List<song> songList;
@@ -46,20 +49,62 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private SwipeRefreshLayout mSwipeRefreshWidget;
     private Toolbar toolbar;
     private Boolean firstlaunch = true;
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
 
-    class refulshReceiver extends BroadcastReceiver
-    {
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.connect();
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Main Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app URL is correct.
+                Uri.parse("android-app://com.qwe7002.reallct.smartradio/http/host/path")
+        );
+        AppIndex.AppIndexApi.start(client, viewAction);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Main Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app URL is correct.
+                Uri.parse("android-app://com.qwe7002.reallct.smartradio/http/host/path")
+        );
+        AppIndex.AppIndexApi.end(client, viewAction);
+        client.disconnect();
+    }
+
+    class refulshReceiver extends BroadcastReceiver {
         @Override
-        public void onReceive(Context context, Intent intent)
-        {
+        public void onReceive(Context context, Intent intent) {
             new getlist().execute();
         }
     }
 
 
     @Override
-    protected void onResume()
-    {
+    protected void onResume() {
         super.onResume();
 
         IntentFilter filter = new IntentFilter();
@@ -70,15 +115,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    protected void onPause()
-    {
+    protected void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -86,15 +129,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+        if (drawer != null) {
+            drawer.setDrawerListener(toggle);
+        }
         toggle.syncState();
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        if (navigationView != null) {
+            navigationView.setNavigationItemSelectedListener(this);
+        }
         //设定navhead的账户系统信息
-        View header = navigationView.inflateHeaderView(R.layout.nav_header_main);
-        TextView tv = (TextView) header.findViewById(R.id.navusername);
+        View header = navigationView != null ? navigationView.inflateHeaderView(R.layout.nav_header_main) : null;
+        TextView tv = (TextView) (header != null ? header.findViewById(R.id.navusername) : null);
         tv.setText(public_value.username);
-        setTitle(public_value.settings.get("projectname").getAsString()+"管理中心");
+        setTitle(public_value.settings.get("projectname").getAsString() + "管理中心");
         //设定正文
         mSwipeRefreshWidget = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_widget);
         recyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
@@ -104,83 +151,69 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         mSwipeRefreshWidget.setColorSchemeResources(R.color.colorPrimary);
         new getlist().execute();
-        mSwipeRefreshWidget.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener()
-        {
+        mSwipeRefreshWidget.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
-            public void onRefresh()
-            {
+            public void onRefresh() {
                 mSwipeRefreshWidget.setRefreshing(true);
                 new getlist().execute();
             }
         });
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
-    public void setSongList(boolean today)
-    {
-        try
-        {
+    public void setSongList(boolean today) {
+        try {
             songList = new ArrayList<song>();
             int row = 0;
-            for (JsonElement jsonElement : public_value.songtable)
-            {
+            for (JsonElement jsonElement : public_value.songtable) {
                 JsonObject item = jsonElement.getAsJsonObject();
                 JsonObject songinfo = public_value.songinfo.get(item.get("songid").getAsString()).getAsJsonObject();
                 String time = item.get("time").getAsString().replace("-", "月") + "日 " + item.get("option").getAsString();
-                if (today)
-                {
+                if (today) {
                     SimpleDateFormat dateformat1 = new SimpleDateFormat("MM-dd");
                     String a1 = dateformat1.format(new Date());
-                    if (a1.equals(item.get("time").getAsString()))
-                    {
+                    if (a1.equals(item.get("time").getAsString())) {
                         songList.add(new song(row, item.get("id").getAsInt(), songinfo.get("songtitle").getAsString(), item.get("message").getAsString(), item.get("user").getAsString(), item.get("to").getAsString(), time, item.get("songid").getAsString(), Integer.parseInt(item.get("info").getAsString())));
                         row++;
                     }
-                } else
-                {
+                } else {
                     songList.add(new song(row, item.get("id").getAsInt(), songinfo.get("songtitle").getAsString(), item.get("message").getAsString(), item.get("user").getAsString(), item.get("to").getAsString(), time, item.get("songid").getAsString(), Integer.parseInt(item.get("info").getAsString())));
                     row++;
                 }
 
             }
-            if (row == 0)
-            {
-                if (public_value.settings.get("permission").getAsString().equals("0"))
-                {
+            if (row == 0) {
+                if (public_value.settings.get("permission").getAsString().equals("0")) {
                     Snackbar.make(mSwipeRefreshWidget, "当前策略禁止点歌！", Snackbar.LENGTH_SHORT).show();
-                } else
-                {
+                } else {
                     Snackbar.make(mSwipeRefreshWidget, "当前选项暂无项目！", Snackbar.LENGTH_SHORT).show();
                 }
 
             }
             RecyclerViewAdapter adapter = new RecyclerViewAdapter(songList, MainActivity.this, toolbar);
             recyclerView.setAdapter(adapter);
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             Log.i("exception", e.toString());
         }
     }
 
     @Override
-    public void onBackPressed()
-    {
+    public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START))
-        {
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        } else
-        {
+        } else {
             super.onBackPressed();
         }
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item)
-    {
+    public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        switch (item.getItemId())
-        {
+        switch (item.getItemId()) {
             case R.id.Today:
                 public_value.navistate = 0;
                 setSongList(true);
@@ -201,9 +234,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 SharedPreferences.Editor editors = getSharedPreferences("user", Context.MODE_PRIVATE).edit();
                 editors.clear();
                 editors.apply();
+                finish();
                 Intent intents = new Intent(this, LoginActivity.class);
                 startActivity(intents);
-                finish();
                 break;
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -211,15 +244,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
-    private void setlostandfound()
-    {
-        if (public_value.laftable.size() == 0)
-        {
+    private void setlostandfound() {
+        if (public_value.laftable.size() == 0) {
             Snackbar.make(mSwipeRefreshWidget, "当前选项暂无项目！", Snackbar.LENGTH_SHORT).show();
         }
         lafList = new ArrayList<laf>();
-        for (JsonElement JE : public_value.laftable)
-        {
+        for (JsonElement JE : public_value.laftable) {
             JsonObject item = JE.getAsJsonObject();
             lafList.add(new laf(item.get("id").getAsInt(), item.get("user").getAsString(), item.get("message").getAsString(), item.get("tel").getAsString()));
         }
@@ -227,15 +257,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         recyclerView.setAdapter(adapter);
     }
 
-    public class getlist extends AsyncTask<Void, Integer, String>
-    {
+    public class getlist extends AsyncTask<Void, Integer, String> {
         ProgressDialog mpDialog = new ProgressDialog(MainActivity.this);
 
         @Override
-        protected void onPreExecute()
-        {
-            if (firstlaunch)
-            {
+        protected void onPreExecute() {
+            if (firstlaunch) {
                 firstlaunch = false;
                 mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                 mpDialog.setTitle("正在连接服务器...");
@@ -247,40 +274,32 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         @Override
-        protected String doInBackground(Void... params)
-        {
-            try
-            {
+        protected String doInBackground(Void... params) {
+            try {
                 return APIs.getlistjson();
 
-            } catch (Exception e)
-            {
+            } catch (Exception e) {
                 return null;
             }
         }
 
 
         @Override
-        protected void onPostExecute(String result)
-        {
+        protected void onPostExecute(String result) {
             mSwipeRefreshWidget.setRefreshing(false);
             mpDialog.cancel();
-            if (result != null)
-            {
+            if (result != null) {
                 Log.i("result", result);
-                try
-                {
+                try {
                     JsonParser parser = new JsonParser();
                     JsonObject object = (JsonObject) parser.parse(result);
                     public_value.songtable = object.getAsJsonArray("songtable");
                     public_value.songinfo = object.getAsJsonObject("songinfo");
                     public_value.laftable = object.getAsJsonArray("lostandfound");
-                } catch (Exception e)
-                {
+                } catch (Exception e) {
                     Log.i("error", e.toString());
                 }
-                switch (public_value.navistate)
-                {
+                switch (public_value.navistate) {
                     case 0:
                         setSongList(true);
                         break;
@@ -292,29 +311,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         break;
                 }
 
-            } else
-            {
+            } else {
                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
                 alertDialog
                         .setTitle("无法连接到网络！")
                         .setMessage("是否进行重试？")
                         .setPositiveButton("确定",
-                                new DialogInterface.OnClickListener()
-                                {
+                                new DialogInterface.OnClickListener() {
                                     @Override
-                                    public void onClick(DialogInterface dialog, int which)
-                                    {
+                                    public void onClick(DialogInterface dialog, int which) {
                                         Intent intent = new Intent(MainActivity.this, MainActivity.class);
                                         startActivity(intent);
                                         finish();
                                     }
                                 })
                         .setNegativeButton("取消",
-                                new DialogInterface.OnClickListener()
-                                {
+                                new DialogInterface.OnClickListener() {
                                     @Override
-                                    public void onClick(DialogInterface dialog, int which)
-                                    {
+                                    public void onClick(DialogInterface dialog, int which) {
                                     }
                                 }).setCancelable(false).create().show();
             }
