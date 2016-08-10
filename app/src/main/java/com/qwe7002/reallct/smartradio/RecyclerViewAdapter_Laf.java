@@ -82,6 +82,7 @@ public class RecyclerViewAdapter_Laf extends RecyclerView.Adapter<RecyclerViewAd
                                     public void onClick(DialogInterface dialog, int which) {
                                         String mode = "lostandfound";
                                         Intent intent = new Intent();
+                                        intent.setAction("refulsh.activity");
                                         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
                                         new sendcontrol().execute("{'mode':'" + mode + "','id':" + laftable.get(j).getid() + ",'submitmode':'single'}");
                                         Snackbar.make(views, "条目已被删除", Snackbar.LENGTH_SHORT).show();
