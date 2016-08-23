@@ -1,8 +1,13 @@
 package com.qwe7002.reallct.smartradio;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
+import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -59,8 +64,25 @@ public class settingActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        new startsetsetting().execute();
-        return;
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        alertDialog
+                .setTitle("提示")
+                .setMessage("您是否要保存当前操作？")
+                .setPositiveButton("确定",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                new startsetsetting().execute();
+                            }
+                        })
+                .setNegativeButton("取消",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                finish();
+                            }
+                        }).setCancelable(false).create().show();
+
     }
 
     private class startsetsetting extends AsyncTask<Void, Void, Boolean> {
@@ -82,7 +104,7 @@ public class settingActivity extends AppCompatActivity {
                 mode = 1;
             }
             if (switchchangestate) {
-                if (switchstate) {
+                if (switchstate){
                     permission = "1";
                 } else {
                     permission = "0";
