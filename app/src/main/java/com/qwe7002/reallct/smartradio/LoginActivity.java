@@ -1,13 +1,18 @@
 package com.qwe7002.reallct.smartradio;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -21,14 +26,18 @@ import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.zxing.activity.CaptureActivity;
 
 import static android.text.TextUtils.isEmpty;
 
 
 public class LoginActivity extends AppCompatActivity {
-
+    public static final int REQUEST_CODE = 0;
     private UserLoginTask mAuthTask = null;
     private TextView mUsernameView;
     private EditText mPasswordView;
@@ -37,10 +46,26 @@ public class LoginActivity extends AppCompatActivity {
     SharedPreferences userinfo;
     private FingerprintManagerCompat manager;
 
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        public_value.HostURl = sharedPreferences.getString("Hostinfo", null);
+        if (public_value.HostURl == null) {
+            sethosturl();
+        } else {
+            new getsettings().execute();
+        }
+    }
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
         mUsernameView = (TextView) findViewById(R.id.username);
         mPasswordView = (EditText) findViewById(R.id.password);
         if (!isNetConnected()) {
@@ -63,13 +88,6 @@ public class LoginActivity extends AppCompatActivity {
             }
             mUsernameView.setText(userinfo.getString("username", null));
             mPasswordView.setText(userinfo.getString("password", null));
-            public_value.HostURl = sharedPreferences.getString("Hostinfo", null);
-            if (public_value.HostURl == null || public_value.HostURl.equals("http://") || public_value.HostURl.equals("")) {
-                sethosturl("http://");
-            } else {
-                new getsettings().execute();
-            }
-
         }
         mUsernameView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -89,29 +107,34 @@ public class LoginActivity extends AppCompatActivity {
                 attemptLogin();
             }
         });
-
-        // 获取一个FingerPrintManagerCompat的实例
         manager = FingerprintManagerCompat.from(this);
     }
 
-    private void sethosturl(String url) {
-        final EditText text = new EditText(this);
-        text.setText(url);
-        text.setHint("服务器地址");
-        text.setMaxLines(1);
-        AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-        alertDialog.setTitle("请输入服务器地址：");
-        alertDialog.setView(text);
-        alertDialog.setCancelable(false);
-        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "确定",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        public_value.HostURl = text.getText().toString();
-                        dialog.dismiss();
-                        new getsettings().execute();
-                    }
-                });
-        alertDialog.show();
+    private void sethosturl() {
+        Intent intent = new Intent(this, CaptureActivity.class);
+        startActivityForResult(intent, REQUEST_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            Bundle bundle = data.getExtras();
+            String scanResult = bundle.getString("result");
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("Hostinfo", scanResult);
+            editor.apply();
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
     }
 
     private class getsettings extends AsyncTask<Void, Void, Boolean> {
@@ -161,7 +184,7 @@ public class LoginActivity extends AppCompatActivity {
                 alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "确定",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                sethosturl(public_value.HostURl);
+                                sethosturl();
                             }
                         });
                 alertDialog.show();
