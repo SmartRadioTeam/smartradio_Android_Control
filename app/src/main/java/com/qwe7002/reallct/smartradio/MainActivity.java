@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     SimpleDateFormat dateformat1 = new SimpleDateFormat("MM-dd");
                     String a1 = dateformat1.format(new Date());
                     if (a1.equals(item.get("time").getAsString())) {
-                        songList.add(new song(row, item.get("id").getAsInt(), songinfo.get("songtitle").getAsString(), item.get("message").getAsString(), item.get("user").getAsString(), item.get("to").getAsString(), time, item.get("songid").getAsString(), Integer.parseInt(item.get("info").getAsString())));
+                        songList.add(new song(row, item.get("id").getAsInt(), songinfo.get("songtitle").getAsString(), item.get("message").getAsString(), item.get("user").getAsString(), item.get("to").getAsString(), time, item.get("songid").getAsString(), item.get("info").getAsInt()));
                         row++;
                     }
                 } else {

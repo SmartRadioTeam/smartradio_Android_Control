@@ -41,7 +41,7 @@ public class APIs {
         List<NameValuePair> Postinfo = new ArrayList<NameValuePair>(3);
         if (muilt) {
             Postinfo = new ArrayList<NameValuePair>(4);
-            Postinfo.add(new BasicNameValuePair("muilt", "true"));
+            Postinfo.add(new BasicNameValuePair("multi", "true"));
             Log.i("send", id);
         }
         Postinfo.add(new BasicNameValuePair("mode", mode));
