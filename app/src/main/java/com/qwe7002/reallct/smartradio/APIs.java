@@ -2,6 +2,10 @@ package com.qwe7002.reallct.smartradio;
 
 import android.util.Log;
 
+import com.squareup.okhttp.FormEncodingBuilder;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
+
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
@@ -13,41 +17,69 @@ import java.util.List;
  */
 public class APIs {
     public static String setsetting(String mode, String value) {
-        List<NameValuePair> Postinfo = new ArrayList<NameValuePair>(4);
-        Postinfo.add(new BasicNameValuePair("mode", mode));
-        Postinfo.add(new BasicNameValuePair("value", value));
-        Postinfo.add(new BasicNameValuePair("resultkey", public_value.sessionid));
-        Postinfo.add(new BasicNameValuePair("username", public_value.username));
-        return Network.SendPost(public_value.HostURl + "/api/admin_control/setting.php", Postinfo);
+        String url = public_value.HostURl + "/api/admin_control/setting.php";
+        RequestBody formBody = new FormEncodingBuilder()
+                .add("mode", mode)
+                .add("value", value)
+                .add("resultkey", public_value.sessionid)
+                .add("username", public_value.username)
+                .build();
+        Request request = new Request.Builder()
+                .url(url)
+                .post(formBody)
+                .build();
+        return Network.Send(request);
     }
 
     public static String getsetting() {
-        return Network.SendGet(public_value.HostURl + "/api/admin_control/systeminfo.php?resultkey=" + public_value.sessionid + "&username=" + public_value.username);
+        String url = public_value.HostURl + "/api/admin_control/systeminfo.php?resultkey=" + public_value.sessionid + "&username=" + public_value.username;
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+        return Network.Send(request);
     }
 
     public static String Login(String User, String Passwd) {
-        List<NameValuePair> Postinfo = new ArrayList<NameValuePair>(3);
-        Postinfo.add(new BasicNameValuePair("username", User));
-        Postinfo.add(new BasicNameValuePair("password", Passwd));
-        Postinfo.add(new BasicNameValuePair("mode", "login"));
-        return Network.SendPost(public_value.HostURl + "/api/admin_control/auth_control.php", Postinfo);
+        String url = public_value.HostURl + "/api/admin_control/auth_control.php";
+        RequestBody formBody = new FormEncodingBuilder()
+                .add("mode", "login")
+                .add("password", Passwd)
+                .add("username", User)
+                .build();
+        Request request = new Request.Builder()
+                .url(url)
+                .post(formBody)
+                .build();
+        return Network.Send(request);
     }
 
     public static String getlistjson() {
-        return Network.SendGet(public_value.HostURl + "/api/admin_control/tableinfo.php?resultkey=" + public_value.sessionid + "&username=" + public_value.username);
+        String url = public_value.HostURl + "/api/admin_control/tableinfo.php?resultkey=" + public_value.sessionid + "&username=" + public_value.username;
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+        return Network.Send(request);
     }
 
-    public static String ItemsControl(String mode, String id, Boolean muilt) {
-        List<NameValuePair> Postinfo = new ArrayList<NameValuePair>(3);
-        if (muilt) {
-            Postinfo = new ArrayList<NameValuePair>(4);
-            Postinfo.add(new BasicNameValuePair("multi", "true"));
-            Log.i("send", id);
+    public static String ItemsControl(String mode, String id, Boolean mulit) {
+        String url = public_value.HostURl + "/api/admin_control/items.php";
+        String Mulitmode;
+        if (mulit) {
+            Mulitmode = "true";
+        } else {
+            Mulitmode = "false";
         }
-        Postinfo.add(new BasicNameValuePair("mode", mode));
-        Postinfo.add(new BasicNameValuePair("id", id));
-        Postinfo.add(new BasicNameValuePair("resultkey", public_value.sessionid));
-        Postinfo.add(new BasicNameValuePair("username", public_value.username));
-        return Network.SendPost(public_value.HostURl + "/api/admin_control/items.php", Postinfo);
+        RequestBody formBody = new FormEncodingBuilder()
+                .add("mode", mode)
+                .add("multi", Mulitmode)
+                .add("id", id)
+                .add("resultkey", public_value.sessionid)
+                .add("username", public_value.username)
+                .build();
+        Request request = new Request.Builder()
+                .url(url)
+                .post(formBody)
+                .build();
+        return Network.Send(request);
     }
 }
