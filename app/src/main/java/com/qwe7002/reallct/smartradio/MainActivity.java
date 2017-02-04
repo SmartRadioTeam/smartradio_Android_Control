@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private SwipeRefreshLayout mSwipeRefreshWidget;
     private Toolbar toolbar;
     private Boolean firstlaunch = true;
+
     @Override
     public void onStart() {
         super.onStart();
