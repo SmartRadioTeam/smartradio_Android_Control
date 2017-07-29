@@ -36,7 +36,7 @@ public class settingActivity extends AppCompatActivity {
         toolbar.setNavigationIcon(R.drawable.ic_check_white_36dp);
         s = (Switch) findViewById(R.id.switch1);
         try {
-            if (public_value.settings.get("permission").getAsString().equals("0")) {
+            if (public_value.settings.get("permission").getAsInt()==0) {
                 s.setChecked(false);
             } else {
                 s.setChecked(true);
