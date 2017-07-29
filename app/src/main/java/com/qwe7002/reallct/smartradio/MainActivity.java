@@ -239,7 +239,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         protected String doInBackground(Void... params) {
             try {
                 return APIs.getlistjson();
-
             } catch (Exception e) {
                 return null;
             }
